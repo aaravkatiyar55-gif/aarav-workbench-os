@@ -1058,16 +1058,42 @@ function updateWritingStatus(statusElement, hasText, updatedAt, emptyMessage) {
 function saveNotebook() {
   const title = notebookTitleInput.value.slice(0, notebookTitleInput.maxLength);
   const body = notebookBodyInput.value.slice(0, notebookBodyInput.maxLength);
+  const hasText = Boolean(title.trim() || body.trim());
+
+  if (!hasText) {
+    const removed = safeRemove(NOTEBOOK_KEY);
+    updateWritingStatus(
+      notebookStatus,
+      false,
+      null,
+      removed ? "Nothing has been written yet." : "This browser cannot clear the empty notebook draft right now.",
+    );
+    return;
+  }
+
   const updatedAt = new Date().toISOString();
   const saved = safeSet(NOTEBOOK_KEY, JSON.stringify({ version: 1, title, body, updatedAt }));
-  updateWritingStatus(notebookStatus, saved, updatedAt, "This browser cannot save the notebook right now.");
+  updateWritingStatus(notebookStatus, saved && hasText, updatedAt, "This browser cannot save the notebook right now.");
 }
 
 function saveJournal() {
   const body = journalInput.value.slice(0, journalInput.maxLength);
+  const hasText = Boolean(body.trim());
+
+  if (!hasText) {
+    const removed = safeRemove(JOURNAL_KEY);
+    updateWritingStatus(
+      journalStatus,
+      false,
+      null,
+      removed ? "Nothing has been written yet." : "This browser cannot clear the empty journal draft right now.",
+    );
+    return;
+  }
+
   const updatedAt = new Date().toISOString();
   const saved = safeSet(JOURNAL_KEY, JSON.stringify({ version: 1, body, updatedAt }));
-  updateWritingStatus(journalStatus, saved, updatedAt, "This browser cannot save the journal right now.");
+  updateWritingStatus(journalStatus, saved && hasText, updatedAt, "This browser cannot save the journal right now.");
 }
 
 function initializeWritingTools() {
