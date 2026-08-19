@@ -7,6 +7,7 @@ This file records observed results only. A planned check is not a pass.
 | JavaScript syntax | Local | Passed | `npm run check` completed after the drag guard update. |
 | Whitespace / patch safety | Local | Passed | `git diff --check` completed with no output. |
 | Five draggable windows | Local browser | Passed | Each title bar was moved with a real pointer drag. A title-bar click was also checked not to move a window. |
+| Project Shelf desktop fit | Local browser | Passed | The shelf body scrolls within a capped window; at the tested desktop size its 509px window stayed inside the 696px desktop area. |
 | Close, minimize, restore | Local browser | Passed | Build Notes minimized then restored from the dock; Toolbox closed then restored from the dock. |
 | Clock and theme persistence | Local browser | Passed | Theme changed, page reloaded, and the saved paper theme was restored. The live clock was visible in the top bar. |
 | Workspace snapshot persistence | Local browser | Passed | A dragged Project Shelf position persisted in a fresh local browser page; Save workspace was activated. |

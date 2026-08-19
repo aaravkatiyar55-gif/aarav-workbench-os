@@ -633,8 +633,8 @@ function bindGlobalControls() {
 
 function initialize() {
   initializeTheme();
-  applyLayout();
   renderProjects();
+  applyLayout();
   bindWindowControls();
   bindGlobalControls();
   updateClock();
