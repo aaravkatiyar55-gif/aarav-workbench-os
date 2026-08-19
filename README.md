@@ -51,6 +51,12 @@ The public demo is deployed on GitHub Pages:
 
 It is a public, password-free static page. The deployed page is checked in a fresh browser page after each release.
 
+## Screenshot
+
+The image below is a real capture of the deployed desktop, with four independently draggable app windows visible.
+
+![Aarav Workbench OS with Start Here, Project Shelf, Build Notes, and Toolbox windows open](docs/screenshots/aarav-workbench-os-deployed.png)
+
 ## Privacy
 
 The app stores only namespaced workspace layout and theme preferences in browser `localStorage` keys beginning with `aarav-workbench-os.`. It does not collect, send, or require personal information.
