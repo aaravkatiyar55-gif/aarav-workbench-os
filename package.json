@@ -1,0 +1,10 @@
+{
+  "name": "aarav-workbench-os",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A local-first browser desktop for exploring Aarav's projects and build notes.",
+  "scripts": {
+    "check": "node --check script.js && node --check projects.js"
+  }
+}

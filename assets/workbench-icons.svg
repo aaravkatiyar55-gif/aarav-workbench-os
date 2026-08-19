@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <symbol id="mark" viewBox="0 0 32 32">
+    <path d="M6 7h20v18H6z" fill="none" stroke="currentColor" stroke-width="2.5" />
+    <path d="M10 12h12M10 17h8M10 22h5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.5" />
+    <circle cx="23" cy="22" r="2" fill="currentColor" />
+  </symbol>
+  <symbol id="folder" viewBox="0 0 32 32">
+    <path d="M4 9h9l3 3h12v12H4z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2.5" />
+    <path d="M4 13h24" fill="none" stroke="currentColor" stroke-width="2.5" />
+  </symbol>
+  <symbol id="note" viewBox="0 0 32 32">
+    <path d="M7 4h18v24H7z" fill="none" stroke="currentColor" stroke-width="2.5" />
+    <path d="M11 10h10M11 15h10M11 20h7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.5" />
+  </symbol>
+  <symbol id="tool" viewBox="0 0 32 32">
+    <path d="M20 5a7 7 0 0 0-8 8L5 20a3 3 0 0 0 4 4l7-7a7 7 0 0 0 8-8l-5 5-4-4z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2.5" />
+  </symbol>
+  <symbol id="snapshot" viewBox="0 0 32 32">
+    <rect x="5" y="7" width="22" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2.5" />
+    <path d="M10 13h5v6h-5zM18 11h5v4h-5zM18 18h5v3h-5z" fill="currentColor" />
+  </symbol>
+  <symbol id="command" viewBox="0 0 32 32">
+    <rect x="4" y="7" width="24" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.5" />
+    <path d="m10 14 4 3-4 3M18 20h5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
+  </symbol>
+  <symbol id="arrow" viewBox="0 0 32 32">
+    <path d="m12 6 10 10-10 10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
+  </symbol>
+</svg>

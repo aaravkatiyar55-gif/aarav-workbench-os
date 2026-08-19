@@ -1,0 +1,14 @@
+# Local editor, operating-system, and temporary evidence files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# This project does not use runtime secrets. Keep future local settings private.
+.env
+.env.*
+!.env.example
+
+# Temporary local test output
+test-output/
+playwright-report/

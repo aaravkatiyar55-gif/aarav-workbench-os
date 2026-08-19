@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
+    />
+    <title>Aarav Workbench OS</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-theme="paper">
+    <a class="skip-link" href="#desktop">Skip to desktop</a>
+
+    <header class="topbar" aria-label="Workbench controls">
+      <div class="brand-lockup">
+        <svg class="brand-mark" aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg>
+        <div>
+          <p class="eyebrow">Personal project desk</p>
+          <p class="brand-name">Aarav Workbench OS</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <time id="clock" class="clock" aria-label="Local time">Loading time</time>
+        <button id="theme-toggle" class="quiet-button" type="button" aria-pressed="false">
+          Use low-light theme
+        </button>
+        <button id="open-command-dock" class="command-button" type="button">
+          <svg aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg>
+          Command Dock <kbd>Ctrl K</kbd>
+        </button>
+      </div>
+    </header>
+
+    <main id="desktop" class="desktop" tabindex="-1" aria-label="Aarav Workbench desktop">
+      <p id="status-message" class="sr-only" aria-live="polite"></p>
+      <div class="desktop-label" aria-hidden="true">WORKBENCH / 01</div>
+
+      <section
+        id="welcome-window"
+        class="os-window window-welcome"
+        data-window-id="welcome"
+        data-default-x="54"
+        data-default-y="58"
+        aria-labelledby="welcome-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Start Here window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span id="welcome-title" class="window-title">Start Here</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Start Here">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Start Here">×</button>
+          </span>
+        </header>
+        <div class="window-body intro-body">
+          <p class="window-kicker">A small desktop, not a portfolio template</p>
+          <h1>Welcome to the project desk.</h1>
+          <p>
+            This is a browser-based workbench for exploring the small tools, experiments, and build notes I am collecting while learning.
+          </p>
+          <div class="intro-actions">
+            <button type="button" class="primary-button" data-open-window="projects">Open Project Shelf</button>
+            <button type="button" class="text-button" data-open-window="notes">Read build notes <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="small-note">Tip: drag a title bar, or use <kbd>Alt</kbd> + arrow keys when a window title is focused.</p>
+        </div>
+      </section>
+
+      <section
+        id="projects-window"
+        class="os-window window-projects"
+        data-window-id="projects"
+        data-default-x="428"
+        data-default-y="92"
+        aria-labelledby="projects-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Project Shelf window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg>
+          <span id="projects-title" class="window-title">Project Shelf</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Project Shelf">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Project Shelf">×</button>
+          </span>
+        </header>
+        <div class="window-body project-body">
+          <div class="window-heading-row">
+            <div>
+              <p class="window-kicker">A few things on the bench</p>
+              <h2>Projects worth opening.</h2>
+            </div>
+            <span id="project-count" class="count-label" aria-live="polite"></span>
+          </div>
+          <label class="search-field" for="project-search">
+            <span>Find a project</span>
+            <input id="project-search" type="search" placeholder="Try “focus” or “local”" autocomplete="off" />
+          </label>
+          <div id="project-list" class="project-list" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section
+        id="notes-window"
+        class="os-window window-notes"
+        data-window-id="notes"
+        data-default-x="892"
+        data-default-y="120"
+        aria-labelledby="notes-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Build Notes window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
+          <span id="notes-title" class="window-title">Build Notes</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Build Notes">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Build Notes">×</button>
+          </span>
+        </header>
+        <div class="window-body notes-body">
+          <p class="window-kicker">What this desk is for</p>
+          <h2>Keep the useful bits close.</h2>
+          <ol class="build-notes">
+            <li>
+              <span class="note-number">01</span>
+              <p><strong>Start with one honest problem.</strong> Small tools become clearer when the first screen explains why they exist.</p>
+            </li>
+            <li>
+              <span class="note-number">02</span>
+              <p><strong>Keep local things local.</strong> This desktop stores only its own layout and theme in the browser.</p>
+            </li>
+            <li>
+              <span class="note-number">03</span>
+              <p><strong>Leave room for the next iteration.</strong> Every window can close, return from the dock, and pick up where it left off.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section
+        id="toolbox-window"
+        class="os-window window-toolbox"
+        data-window-id="toolbox"
+        data-default-x="94"
+        data-default-y="438"
+        aria-labelledby="toolbox-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Toolbox window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg>
+          <span id="toolbox-title" class="window-title">Toolbox</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Toolbox">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Toolbox">×</button>
+          </span>
+        </header>
+        <div class="window-body toolbox-body">
+          <p class="window-kicker">Things behind the projects</p>
+          <h2>Small, practical tools.</h2>
+          <ul class="tool-list">
+            <li><span>Web</span><strong>HTML · CSS · JavaScript</strong></li>
+            <li><span>Editor</span><strong>VS Code</strong></li>
+            <li><span>Versioning</span><strong>Git · GitHub</strong></li>
+            <li><span>Publishing</span><strong>GitHub Pages</strong></li>
+          </ul>
+          <p class="small-note">No login, server account, or hidden data is needed to explore this OS.</p>
+        </div>
+      </section>
+
+      <section
+        id="snapshot-window"
+        class="os-window window-snapshot"
+        data-window-id="snapshot"
+        data-default-x="484"
+        data-default-y="474"
+        data-start-minimized="true"
+        aria-labelledby="snapshot-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Workspace Snapshot window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg>
+          <span id="snapshot-title" class="window-title">Workspace Snapshot</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Workspace Snapshot">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Workspace Snapshot">×</button>
+          </span>
+        </header>
+        <div class="window-body snapshot-body">
+          <p class="window-kicker">Guide-extra feature</p>
+          <h2>Remember this desk.</h2>
+          <p id="layout-summary">Your current window layout can be saved to this browser.</p>
+          <div class="snapshot-actions">
+            <button id="save-workspace" class="primary-button" type="button">Save workspace</button>
+            <button id="reset-layout" class="quiet-button" type="button">Reset layout</button>
+          </div>
+          <p class="small-note">Saved locally on this device. Nothing is sent anywhere.</p>
+        </div>
+      </section>
+    </main>
+
+    <nav class="dock" aria-label="Open applications">
+      <button type="button" class="dock-item" data-open-window="welcome" aria-label="Open Start Here">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg><span>Start</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="projects" aria-label="Open Project Shelf">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg><span>Projects</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="notes" aria-label="Open Build Notes">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Notes</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="toolbox" aria-label="Open Toolbox">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Tools</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>
+      </button>
+    </nav>
+
+    <dialog id="command-dock" class="command-dock" aria-labelledby="command-dock-title">
+      <div class="command-dialog-header">
+        <div>
+          <p class="window-kicker">Keyboard shortcut</p>
+          <h2 id="command-dock-title">Command Dock</h2>
+        </div>
+        <button id="close-command-dock" class="window-action close-action" type="button" aria-label="Close Command Dock">×</button>
+      </div>
+      <label class="command-search" for="command-search">
+        <span>Search commands</span>
+        <input id="command-search" type="search" placeholder="Open projects, reset layout…" autocomplete="off" />
+      </label>
+      <div id="command-results" class="command-results" role="listbox" aria-label="Available commands"></div>
+      <p class="dialog-help"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> run <kbd>Esc</kbd> close</p>
+    </dialog>
+
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
