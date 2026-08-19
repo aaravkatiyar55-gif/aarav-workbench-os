@@ -45,7 +45,11 @@ Then test dragging, close/minimize/restore, Command Dock, `Alt` + arrow movement
 
 ## Deployment
 
-The intended public host is GitHub Pages. This section will be updated with the real public demo URL after deployment succeeds and is verified in a fresh browser page.
+The public demo is deployed on GitHub Pages:
+
+- https://aaravkatiyar55-gif.github.io/aarav-workbench-os/
+
+It is a public, password-free static page. The deployed page is checked in a fresh browser page after each release.
 
 ## Privacy
 
@@ -57,4 +61,4 @@ OpenAI Codex is being used for planning, implementation support, testing guidanc
 
 ## Current status
 
-The local implementation is in progress. Public deployment, live-link verification, screenshots, devlogs, and Stardance shipping evidence are pending until they are actually completed.
+The local implementation and first public deployment are complete. Live-link verification, a clean deployed screenshot, factual devlogs, project-info evidence, and final Stardance ship readiness are tracked separately and are added only when actually completed.
