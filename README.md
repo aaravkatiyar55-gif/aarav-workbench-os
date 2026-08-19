@@ -76,7 +76,7 @@ It is a public, password-free static page. After a push to `main`, GitHub Pages 
 
 ## Screenshot
 
-This is a real capture of the foundational deployed desktop. A later clean capture of the expanded local-first desktop is prepared only after that deployed version is verified.
+This is a real capture of the foundational deployed desktop. A separate clean browser capture of the expanded local-first desktop was made after fresh public verification; it has not been uploaded to Stardance. Do not use the foundational image below as proof of the later expansion.
 
 ![Foundational deployed Aarav Workbench OS desktop](docs/screenshots/aarav-workbench-os-deployed.png)
 
@@ -90,4 +90,4 @@ OpenAI Codex was used for planning, implementation assistance, debugging, testin
 
 ## Current status
 
-The local-first expansion has been implemented and is being checked locally. Public deployment verification, a clean expanded screenshot, factual devlog drafts, Stardance project-info updates, and any final Ship action remain separate actions and are performed only when genuinely ready and explicitly approved.
+The local-first expansion is deployed and was freshly checked at the public URL. A clean expanded screenshot was captured but not uploaded, and factual devlog drafts remain local-only. Stardance project-info updates and any final Ship action remain separate actions and require genuine evidence plus explicit approval.

@@ -24,7 +24,7 @@ This file records observed results only. A planned check is not a pass.
 | Launchpad URLs | Local browser DOM | Passed for link targets | YouTube, Facebook, and Instagram point to their official HTTPS sites with new-tab security attributes. They were not opened during test. |
 | Runtime console | Isolated local browser | Passed | Browser error and warning logs were empty after writing, themes, games, console, and streak checks. |
 | Responsive layout | Local browser | Passed | Real 360px, 768px, 1280px, and 1440px viewport overrides were checked. An initial 768px dock overflow was fixed; the final pass had no horizontal document overflow at any tested width. |
-| Deployed website | Public GitHub Pages | Passed for foundational release | The earlier foundation was fresh-cache checked. The expanded release requires a new post-push Pages and fresh-tab verification before it is marked deployed. |
+| Deployed website | Fresh public GitHub Pages tab | Passed | The v4 CSS/JS assets loaded at the public URL. The visible Run button handled `status`, `open games`, and `theme paper`; Command Dock filtering plus Escape were checked; 360px, 768px, 1280px, and 1440px had no horizontal document overflow; browser error/warning logs were empty. A clean browser screenshot was captured but not uploaded. |
 
 ## Test boundaries
 
