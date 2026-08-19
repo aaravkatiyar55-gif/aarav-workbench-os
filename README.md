@@ -10,15 +10,16 @@ The public app has no sign-in, password, cloud sync, server-side storage, analyt
 
 ## Features
 
-- Multiple draggable, closable, and minimizable windows with dock restore and front-of-stack focus
+- A quiet first landing with every app closed until the visitor chooses one from the landing actions, dock, or Command Dock
+- Multiple draggable, closable, minimizable, and maximizable windows with dock restore and front-of-stack focus
 - Live local clock, Command Dock (`Ctrl`/`Cmd` + `K`), and `Alt` + arrow movement for a focused title bar
 - Project Shelf with verified public source/demo links, plus Build Notes and Toolbox windows
 - **Notebook** and **Story Journal** for browser-local writing; each has its own clear control and confirmation
-- Optional browser speech recognition for the journal, only after a visitor starts it and their browser handles permission; Workbench does not retain audio
+- Optional browser speech recognition for the journal, with Hindi and English choices, only after a visitor starts it and their browser handles permission; Workbench does not retain audio
 - **Theme Lab** with Paper, Night, Moss, and Ember themes, a WebOS-only quieter-motion setting, and a session-only custom wallpaper preview
-- **Game Room** with Signal Sprint reaction play and Desk Grid memory matching; local best scores persist in the browser
+- **Game Room** with a keyboard-accessible game switcher for Signal Sprint reaction play and Desk Grid memory matching; local best scores persist in the browser
 - **Workbench Console** with a small allowlist of browser-only commands such as `help`, `open notebook`, `open games`, `theme moss`, `status`, and `clear`
-- **Launchpad** links that open YouTube, Facebook, and Instagram in a new tab without embedding, signing in to, or controlling those services
+- **Launchpad** links that open YouTube, Facebook, and Instagram in a new tab without embedding, signing in to, controlling, or changing advertising on those services
 - A browser-local check-in streak that is not coding time, a Stardance reward, transferable value, or a prize
 - Mobile stacked-window layout and reduced-motion support
 

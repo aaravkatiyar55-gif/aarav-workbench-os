@@ -1,7 +1,7 @@
 import { projects } from "./projects.js";
 
 const STORAGE_PREFIX = "aarav-workbench-os";
-const LAYOUT_KEY = `${STORAGE_PREFIX}.layout.v1`;
+const LAYOUT_KEY = `${STORAGE_PREFIX}.layout.v2`;
 const LEGACY_THEME_KEY = `${STORAGE_PREFIX}.theme.v1`;
 const THEME_KEY = `${STORAGE_PREFIX}.theme.v2`;
 const NOTEBOOK_KEY = `${STORAGE_PREFIX}.notebook.v1`;
@@ -10,7 +10,7 @@ const PERFORMANCE_KEY = `${STORAGE_PREFIX}.performance.v1`;
 const SIGNAL_SPRINT_KEY = `${STORAGE_PREFIX}.signal-sprint.v1`;
 const DESK_GRID_KEY = `${STORAGE_PREFIX}.desk-grid.v1`;
 const STREAK_KEY = `${STORAGE_PREFIX}.streak.v1`;
-const LAYOUT_VERSION = 1;
+const LAYOUT_VERSION = 2;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
 const MAX_CONSOLE_LINES = 100;
@@ -40,6 +40,7 @@ const journalStatus = document.querySelector("#journal-status");
 const voiceStatus = document.querySelector("#voice-status");
 const startDictationButton = document.querySelector("#start-dictation");
 const stopDictationButton = document.querySelector("#stop-dictation");
+const speechLanguage = document.querySelector("#speech-language");
 const clearDataDialog = document.querySelector("#clear-data-dialog");
 const clearDataTitle = document.querySelector("#clear-data-title");
 const clearDataDescription = document.querySelector("#clear-data-description");
@@ -58,6 +59,9 @@ const deskGrid = document.querySelector("#desk-grid");
 const deskGridStatus = document.querySelector("#desk-grid-status");
 const deskGridBest = document.querySelector("#desk-grid-best");
 const deskGridNewButton = document.querySelector("#desk-grid-new");
+const gameTabs = [...document.querySelectorAll("[data-game-tab]")];
+const gamePanels = [...document.querySelectorAll("[data-game-panel]")];
+const landingPanel = document.querySelector("#landing-panel");
 const consoleForm = document.querySelector("#console-form");
 const consoleInput = document.querySelector("#console-input");
 const consoleOutput = document.querySelector("#console-output");
@@ -161,8 +165,9 @@ function defaultWindowState(windowElement) {
   return {
     x: Number(windowElement.dataset.defaultX) || 0,
     y: Number(windowElement.dataset.defaultY) || 0,
-    isOpen: true,
-    isMinimized: windowElement.dataset.startMinimized === "true",
+    isOpen: false,
+    isMinimized: false,
+    isMaximized: false,
     z: 1,
   };
 }
@@ -173,6 +178,7 @@ function currentWindowState(windowElement) {
     y: asFiniteNumber(Number.parseFloat(windowElement.style.top), Number(windowElement.dataset.defaultY) || 0),
     isOpen: !windowElement.hidden,
     isMinimized: windowElement.dataset.minimized === "true",
+    isMaximized: windowElement.dataset.maximized === "true",
     z: asFiniteNumber(Number.parseInt(windowElement.style.zIndex, 10), 1),
   };
 }
@@ -187,6 +193,7 @@ function normalizeSavedWindowState(candidate, fallback) {
     y: asFiniteNumber(candidate.y, fallback.y),
     isOpen: typeof candidate.isOpen === "boolean" ? candidate.isOpen : fallback.isOpen,
     isMinimized: typeof candidate.isMinimized === "boolean" ? candidate.isMinimized : fallback.isMinimized,
+    isMaximized: typeof candidate.isMaximized === "boolean" ? candidate.isMaximized : fallback.isMaximized,
     z: asFiniteNumber(candidate.z, fallback.z),
   };
 }
@@ -257,6 +264,7 @@ function updateLayoutSummary() {
   const minimizedWindows = openWindows.filter((windowElement) => windowElement.dataset.minimized === "true");
   const visibleWindows = openWindows.length - minimizedWindows.length;
   layoutSummary.textContent = `${visibleWindows} visible, ${minimizedWindows.length} minimized. This layout is saved only in this browser.`;
+  landingPanel.hidden = visibleWindows > 0;
 }
 
 function serializeLayout() {
@@ -292,6 +300,7 @@ function focusWindow(windowElement, { shouldFocus = true, announceFocus = false 
   windowElement.dataset.minimized = "false";
   bringToFront(windowElement);
   updateDockItem(windowElement);
+  updateMaximizeControl(windowElement);
   updateLayoutSummary();
 
   if (shouldFocus) {
@@ -314,6 +323,7 @@ function minimizeWindow(windowElement) {
   }
   windowElement.dataset.minimized = "true";
   updateDockItem(windowElement);
+  updateMaximizeControl(windowElement);
   persistLayout();
   document.querySelector(`[data-open-window="${windowElement.dataset.windowId}"]`)?.focus({ preventScroll: true });
   announce(`${friendlyTitle(windowElement)} minimized.`);
@@ -329,6 +339,7 @@ function closeWindow(windowElement) {
   windowElement.hidden = true;
   windowElement.dataset.minimized = "false";
   updateDockItem(windowElement);
+  updateMaximizeControl(windowElement);
   persistLayout();
   document.querySelector(`[data-open-window="${windowElement.dataset.windowId}"]`)?.focus({ preventScroll: true });
   announce(`${friendlyTitle(windowElement)} closed. Use the dock to bring it back.`);
@@ -342,6 +353,40 @@ function restoreWindow(windowElement) {
   persistLayout();
 }
 
+function updateMaximizeControl(windowElement) {
+  const maximizeButton = windowElement.querySelector('[data-action="maximize"]');
+  if (!maximizeButton) {
+    return;
+  }
+
+  const maximized = windowElement.dataset.maximized === "true";
+  const title = friendlyTitle(windowElement);
+  maximizeButton.textContent = maximized ? "▣" : "□";
+  maximizeButton.setAttribute("aria-label", `${maximized ? "Restore" : "Maximize"} ${title}`);
+  maximizeButton.setAttribute("title", `${maximized ? "Restore" : "Maximize"} ${title}`);
+  maximizeButton.setAttribute("aria-pressed", String(maximized));
+}
+
+function toggleMaximizeWindow(windowElement) {
+  if (isMobileLayout()) {
+    announce("Windows already use the full mobile width.");
+    return;
+  }
+
+  if (windowElement.hidden) {
+    windowElement.hidden = false;
+    windowElement.dataset.minimized = "false";
+  }
+
+  const willMaximize = windowElement.dataset.maximized !== "true";
+  windowElement.dataset.maximized = String(willMaximize);
+  bringToFront(windowElement);
+  updateDockItem(windowElement);
+  updateMaximizeControl(windowElement);
+  persistLayout();
+  announce(`${friendlyTitle(windowElement)} ${willMaximize ? "maximized" : "restored"}.`);
+}
+
 function applyLayout() {
   const savedLayout = readSavedLayout();
   let highestSavedZ = 1;
@@ -352,6 +397,7 @@ function applyLayout() {
 
     windowElement.hidden = !saved.isOpen;
     windowElement.dataset.minimized = String(saved.isMinimized && saved.isOpen);
+    windowElement.dataset.maximized = String(saved.isMaximized && saved.isOpen && !saved.isMinimized);
     windowElement.style.zIndex = String(saved.z);
     setWindowPosition(windowElement, saved.x, saved.y);
     highestSavedZ = Math.max(highestSavedZ, saved.z);
@@ -359,6 +405,7 @@ function applyLayout() {
 
   topZIndex = highestSavedZ;
   updateAllDockItems();
+  windowElements.forEach(updateMaximizeControl);
   updateLayoutSummary();
 }
 
@@ -369,12 +416,14 @@ function resetLayout() {
     const fallback = defaultWindowState(windowElement);
     windowElement.hidden = !fallback.isOpen;
     windowElement.dataset.minimized = String(fallback.isMinimized);
+    windowElement.dataset.maximized = String(fallback.isMaximized);
     windowElement.style.zIndex = String(index + 1);
     setWindowPosition(windowElement, fallback.x, fallback.y);
   });
 
   topZIndex = windowElements.length + 1;
   updateAllDockItems();
+  windowElements.forEach(updateMaximizeControl);
   updateLayoutSummary();
   announce(layoutRemoved
     ? "Default workspace layout restored. Your theme was kept."
@@ -771,6 +820,24 @@ function initializeGames() {
   updateSignalBest();
   updateDeskGridBest();
   createDeskGrid();
+  setActiveGamePanel("signal");
+}
+
+function setActiveGamePanel(gameId, { focusTab = false } = {}) {
+  const selectedId = gamePanels.some((panel) => panel.dataset.gamePanel === gameId) ? gameId : "signal";
+
+  gameTabs.forEach((tab) => {
+    const selected = tab.dataset.gameTab === selectedId;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    if (selected && focusTab) {
+      tab.focus({ preventScroll: true });
+    }
+  });
+
+  gamePanels.forEach((panel) => {
+    panel.hidden = panel.dataset.gamePanel !== selectedId;
+  });
 }
 
 function localDateKey(date = new Date()) {
@@ -1088,9 +1155,9 @@ function configureSpeechRecognition() {
   }
 
   const recognition = new Recognition();
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = false;
-  recognition.lang = document.documentElement.lang || navigator.language || "en-US";
+  recognition.lang = speechLanguage.value || navigator.language || "en-IN";
 
   recognition.addEventListener("result", (event) => {
     let transcript = "";
@@ -1135,7 +1202,7 @@ function startDictation() {
   }
 
   try {
-    setDictationState(true, "Listening… spoken words will be added to this local draft.");
+    setDictationState(true, `Listening in ${speechLanguage.options[speechLanguage.selectedIndex].text}… spoken words will be added to this local draft.`);
     speechRecognition.start();
   } catch {
     setDictationState(false, "Voice input could not start. You can keep typing instead.");
@@ -1305,6 +1372,16 @@ function runCommand(command) {
 function bindWindowControls() {
   windowElements.forEach((windowElement) => {
     const titlebar = windowElement.querySelector("[data-drag-handle]");
+    const actions = windowElement.querySelector(".window-actions");
+
+    if (!actions.querySelector('[data-action="maximize"]')) {
+      const maximizeButton = document.createElement("button");
+      maximizeButton.className = "window-action maximize-action";
+      maximizeButton.type = "button";
+      maximizeButton.dataset.action = "maximize";
+      actions.insertBefore(maximizeButton, actions.querySelector('[data-action="minimize"]'));
+    }
+    updateMaximizeControl(windowElement);
 
     titlebar.addEventListener("focus", () => {
       if (!windowElement.hidden) {
@@ -1312,12 +1389,20 @@ function bindWindowControls() {
       }
     });
     titlebar.addEventListener("pointerdown", (event) => startDrag(event, windowElement, titlebar));
+    titlebar.addEventListener("dblclick", (event) => {
+      if (!event.target.closest("button")) {
+        toggleMaximizeWindow(windowElement);
+      }
+    });
 
     windowElement.querySelectorAll("[data-action]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         if (button.dataset.action === "minimize") {
           minimizeWindow(windowElement);
+        }
+        if (button.dataset.action === "maximize") {
+          toggleMaximizeWindow(windowElement);
         }
         if (button.dataset.action === "close") {
           closeWindow(windowElement);
@@ -1328,7 +1413,7 @@ function bindWindowControls() {
 }
 
 function startDrag(event, windowElement, handle) {
-  if (isMobileLayout() || event.button !== 0 || event.target.closest("button, input, a")) {
+  if (isMobileLayout() || windowElement.dataset.maximized === "true" || event.button !== 0 || event.target.closest("button, input, a")) {
     return;
   }
 
@@ -1395,6 +1480,21 @@ function bindGlobalControls() {
   signalStartButton.addEventListener("click", startSignalSprint);
   signalPressButton.addEventListener("click", pressSignalSprint);
   deskGridNewButton.addEventListener("click", createDeskGrid);
+  gameTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => setActiveGamePanel(tab.dataset.gameTab, { focusTab: false }));
+    tab.addEventListener("keydown", (event) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+        return;
+      }
+      event.preventDefault();
+      const nextIndex = event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? gameTabs.length - 1
+          : (index + (event.key === 'ArrowRight' ? 1 : -1) + gameTabs.length) % gameTabs.length;
+      setActiveGamePanel(gameTabs[nextIndex].dataset.gameTab, { focusTab: true });
+    });
+  });
   consoleForm.addEventListener("submit", (event) => {
     event.preventDefault();
     executeConsoleInput();
@@ -1419,6 +1519,13 @@ function bindGlobalControls() {
   document.querySelector("#clear-journal").addEventListener("click", (event) => openClearDataDialog("journal", event.currentTarget));
   startDictationButton.addEventListener("click", startDictation);
   stopDictationButton.addEventListener("click", stopDictation);
+  speechLanguage.addEventListener("change", () => {
+    if (isDictating) {
+      stopDictation();
+    }
+    speechRecognition = null;
+    voiceStatus.textContent = `Voice language set to ${speechLanguage.options[speechLanguage.selectedIndex].text}. Choose Start voice input when ready.`;
+  });
   cancelClearDataButton.addEventListener("click", closeClearDataDialog);
   confirmClearDataButton.addEventListener("click", clearSelectedWriting);
   clearDataDialog.addEventListener("close", () => {
@@ -1478,7 +1585,7 @@ function bindGlobalControls() {
     }
 
     const currentWindow = event.target.closest?.(".os-window") || windowsById.get(activeWindowId);
-    if (!currentWindow || currentWindow.hidden || isMobileLayout()) {
+    if (!currentWindow || currentWindow.hidden || currentWindow.dataset.maximized === "true" || isMobileLayout()) {
       return;
     }
 

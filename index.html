@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=local-first-v4" />
+    <link rel="stylesheet" href="style.css?v=workspace-v5" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -37,6 +37,18 @@
     <main id="desktop" class="desktop" tabindex="-1" aria-label="Aarav Workbench desktop">
       <p id="status-message" class="sr-only" aria-live="polite"></p>
       <div class="desktop-label" aria-hidden="true">WORKBENCH / 01</div>
+
+      <section id="landing-panel" class="landing-panel" aria-labelledby="landing-title">
+        <p class="window-kicker">A quieter starting desk</p>
+        <h1 id="landing-title">Open one thing at a time.</h1>
+        <p>Choose a desk tool below, or use the dock when you know where you want to go. Your saved workspace still returns after you open something.</p>
+        <div class="landing-actions">
+          <button type="button" class="primary-button" data-open-window="welcome">Start here</button>
+          <button type="button" class="quiet-button" data-open-window="projects">Browse projects</button>
+          <button type="button" class="quiet-button" data-open-window="games">Take a desk break</button>
+        </div>
+        <p class="small-note">Tip: every window can be maximized, minimized, or closed. The dock is always available.</p>
+      </section>
 
       <section
         id="welcome-window"
@@ -272,6 +284,14 @@
             <textarea id="journal-input" rows="8" maxlength="12000" placeholder="A small memory, an idea, or something you want to remember…"></textarea>
           </label>
           <div class="voice-controls">
+            <label class="speech-language" for="speech-language">
+              <span>Voice language</span>
+              <select id="speech-language">
+                <option value="en-IN">English (India)</option>
+                <option value="hi-IN">Hindi</option>
+                <option value="en-US">English (US)</option>
+              </select>
+            </label>
             <button id="start-dictation" class="quiet-button" type="button">Start voice input</button>
             <button id="stop-dictation" class="quiet-button" type="button" disabled>Stop voice input</button>
           </div>
@@ -305,7 +325,12 @@
           <p class="window-kicker">Offline desk breaks</p>
           <h2>Two small games, no account needed.</h2>
 
-          <section class="game-card" aria-labelledby="signal-sprint-title">
+          <div class="game-tabs" role="tablist" aria-label="Choose a desk game">
+            <button id="signal-game-tab" type="button" role="tab" aria-selected="true" aria-controls="signal-game-panel" data-game-tab="signal">Signal Sprint</button>
+            <button id="grid-game-tab" type="button" role="tab" aria-selected="false" aria-controls="grid-game-panel" data-game-tab="grid" tabindex="-1">Desk Grid</button>
+          </div>
+
+          <section id="signal-game-panel" class="game-card" role="tabpanel" aria-labelledby="signal-game-tab" data-game-panel="signal">
             <div class="game-heading">
               <div>
                 <p class="game-label">Reaction game</p>
@@ -321,7 +346,7 @@
             <p class="small-note">Keyboard: focus “Press now” and use <kbd>Space</kbd>. A too-early press ends the run.</p>
           </section>
 
-          <section class="game-card" aria-labelledby="desk-grid-title">
+          <section id="grid-game-panel" class="game-card" role="tabpanel" aria-labelledby="grid-game-tab" data-game-panel="grid" hidden>
             <div class="game-heading">
               <div>
                 <p class="game-label">Memory game</p>
@@ -428,7 +453,7 @@
         <div class="window-body launchpad-body">
           <p class="window-kicker">Direct links and local activity</p>
           <h2>Leave the desk when you want.</h2>
-          <p class="small-note">These open their official websites in a new tab. Workbench does not sign in, embed, or control them.</p>
+          <p class="small-note">These open their official websites in a new tab. Workbench does not sign in, embed, control them, or change their advertising.</p>
           <div class="launchpad-links" aria-label="Open official websites">
             <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span></a>
             <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span></a>
@@ -511,6 +536,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=local-first-v4"></script>
+    <script type="module" src="script.js?v=workspace-v5"></script>
   </body>
 </html>

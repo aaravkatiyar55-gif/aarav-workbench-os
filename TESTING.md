@@ -25,6 +25,7 @@ This file records observed results only. A planned check is not a pass.
 | Runtime console | Isolated local browser | Passed | Browser error and warning logs were empty after writing, themes, games, console, and streak checks. |
 | Responsive layout | Local browser | Passed | Real 360px, 768px, 1280px, and 1440px viewport overrides were checked. An initial 768px dock overflow was fixed; the final pass had no horizontal document overflow at any tested width. |
 | Deployed website | Fresh public GitHub Pages tab | Passed | The v4 CSS/JS assets loaded at the public URL. The visible Run button handled `status`, `open games`, and `theme paper`; Command Dock filtering plus Escape were checked; 360px, 768px, 1280px, and 1440px had no horizontal document overflow; browser error/warning logs were empty. A clean browser screenshot was captured but not uploaded. |
+| Quiet landing / maximize / game tabs / voice language | Source + syntax checks | Source-checked | The v5 update starts with all app windows closed, adds maximize/restore state to layout v2, provides an accessible Signal Sprint / Desk Grid tab switcher, and lets a visitor choose Hindi or English speech recognition. Fresh browser interaction testing is pending before a runtime or deployed claim. |
 
 ## Test boundaries
 
