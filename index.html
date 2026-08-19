@@ -284,6 +284,61 @@
       </section>
 
       <section
+        id="games-window"
+        class="os-window window-games"
+        data-window-id="games"
+        data-default-x="1174"
+        data-default-y="418"
+        data-start-minimized="true"
+        aria-labelledby="games-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Game Room window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg>
+          <span id="games-title" class="window-title">Game Room</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Game Room">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Game Room">×</button>
+          </span>
+        </header>
+        <div class="window-body games-body">
+          <p class="window-kicker">Offline desk breaks</p>
+          <h2>Two small games, no account needed.</h2>
+
+          <section class="game-card" aria-labelledby="signal-sprint-title">
+            <div class="game-heading">
+              <div>
+                <p class="game-label">Reaction game</p>
+                <h3 id="signal-sprint-title">Signal Sprint</h3>
+              </div>
+              <output id="signal-best" class="game-score">Best: —</output>
+            </div>
+            <p id="signal-status" class="game-status" role="status">Start a run, wait for the signal, then press now.</p>
+            <div class="game-actions">
+              <button id="signal-start" class="primary-button" type="button">Start signal run</button>
+              <button id="signal-press" class="quiet-button" type="button" disabled>Press now</button>
+            </div>
+            <p class="small-note">Keyboard: focus “Press now” and use <kbd>Space</kbd>. A too-early press ends the run.</p>
+          </section>
+
+          <section class="game-card" aria-labelledby="desk-grid-title">
+            <div class="game-heading">
+              <div>
+                <p class="game-label">Memory game</p>
+                <h3 id="desk-grid-title">Desk Grid</h3>
+              </div>
+              <output id="desk-grid-best" class="game-score">Best: —</output>
+            </div>
+            <p id="desk-grid-status" class="game-status" role="status">Match the six pairs in as few turns as you can.</p>
+            <div id="desk-grid" class="desk-grid" role="group" aria-label="Desk Grid cards"></div>
+            <div class="game-actions">
+              <button id="desk-grid-new" class="quiet-button" type="button">New board</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section
         id="snapshot-window"
         class="os-window window-snapshot"
         data-window-id="snapshot"
@@ -335,6 +390,9 @@
       </button>
       <button type="button" class="dock-item" data-open-window="journal" aria-label="Open Story Journal">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Journal</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="games" aria-label="Open Game Room">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg><span>Games</span>
       </button>
       <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>

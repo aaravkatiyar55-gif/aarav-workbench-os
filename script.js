@@ -7,6 +7,8 @@ const THEME_KEY = `${STORAGE_PREFIX}.theme.v2`;
 const NOTEBOOK_KEY = `${STORAGE_PREFIX}.notebook.v1`;
 const JOURNAL_KEY = `${STORAGE_PREFIX}.journal.v1`;
 const PERFORMANCE_KEY = `${STORAGE_PREFIX}.performance.v1`;
+const SIGNAL_SPRINT_KEY = `${STORAGE_PREFIX}.signal-sprint.v1`;
+const DESK_GRID_KEY = `${STORAGE_PREFIX}.desk-grid.v1`;
 const LAYOUT_VERSION = 1;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
@@ -46,6 +48,14 @@ const wallpaperStatus = document.querySelector("#wallpaper-status");
 const resetWallpaperButton = document.querySelector("#reset-wallpaper");
 const performanceModeToggle = document.querySelector("#performance-mode-toggle");
 const performanceStatus = document.querySelector("#performance-status");
+const signalStartButton = document.querySelector("#signal-start");
+const signalPressButton = document.querySelector("#signal-press");
+const signalStatus = document.querySelector("#signal-status");
+const signalBest = document.querySelector("#signal-best");
+const deskGrid = document.querySelector("#desk-grid");
+const deskGridStatus = document.querySelector("#desk-grid-status");
+const deskGridBest = document.querySelector("#desk-grid-best");
+const deskGridNewButton = document.querySelector("#desk-grid-new");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -59,6 +69,26 @@ let clearDataTrigger = null;
 let speechRecognition = null;
 let isDictating = false;
 let customWallpaperUrl = null;
+let signalSprintTimer = null;
+let signalSprintState = "idle";
+let signalReadyAt = null;
+let deskGridState = {
+  cards: [],
+  firstIndex: null,
+  locked: false,
+  attempts: 0,
+  matches: 0,
+  mismatchTimer: null,
+};
+
+const DESK_GRID_PAIRS = [
+  { symbol: "▲", name: "triangle" },
+  { symbol: "●", name: "circle" },
+  { symbol: "◆", name: "diamond" },
+  { symbol: "✦", name: "star" },
+  { symbol: "☾", name: "moon" },
+  { symbol: "✚", name: "cross" },
+];
 
 function isMobileLayout() {
   return window.matchMedia("(max-width: 767px)").matches;
@@ -267,6 +297,9 @@ function minimizeWindow(windowElement) {
   if (windowElement.dataset.windowId === "journal") {
     stopDictation();
   }
+  if (windowElement.dataset.windowId === "games") {
+    stopGames();
+  }
   windowElement.dataset.minimized = "true";
   updateDockItem(windowElement);
   persistLayout();
@@ -277,6 +310,9 @@ function minimizeWindow(windowElement) {
 function closeWindow(windowElement) {
   if (windowElement.dataset.windowId === "journal") {
     stopDictation();
+  }
+  if (windowElement.dataset.windowId === "games") {
+    stopGames();
   }
   windowElement.hidden = true;
   windowElement.dataset.minimized = "false";
@@ -455,6 +491,238 @@ function setTemporaryWallpaper(file) {
   resetWallpaperButton.disabled = false;
   wallpaperStatus.textContent = "Temporary wallpaper active for this tab only. It was not uploaded or saved.";
   announce("Temporary wallpaper applied for this tab only.");
+}
+
+function readGameBest(key, propertyName) {
+  const rawScore = safeGet(key);
+  if (!rawScore) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawScore);
+    const value = parsed?.version === 1 ? parsed[propertyName] : null;
+    return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function updateSignalBest() {
+  const bestMs = readGameBest(SIGNAL_SPRINT_KEY, "bestMs");
+  signalBest.textContent = bestMs ? `Best: ${bestMs} ms` : "Best: —";
+}
+
+function updateDeskGridBest() {
+  const bestAttempts = readGameBest(DESK_GRID_KEY, "bestAttempts");
+  deskGridBest.textContent = bestAttempts ? `Best: ${bestAttempts} turns` : "Best: —";
+}
+
+function finishSignalSprint(message) {
+  if (signalSprintTimer) {
+    window.clearTimeout(signalSprintTimer);
+    signalSprintTimer = null;
+  }
+
+  signalSprintState = "idle";
+  signalReadyAt = null;
+  signalStartButton.textContent = "Start signal run";
+  signalPressButton.disabled = true;
+  signalStatus.textContent = message;
+}
+
+function startSignalSprint() {
+  finishSignalSprint("Signal run starting. Wait for the next message.");
+  signalSprintState = "waiting";
+  signalStartButton.textContent = "Restart signal run";
+  signalPressButton.disabled = false;
+  signalStatus.textContent = "Waiting for the signal. Pressing early ends this run.";
+
+  const waitMs = 1200 + Math.floor(Math.random() * 2001);
+  signalSprintTimer = window.setTimeout(() => {
+    signalSprintTimer = null;
+    signalSprintState = "ready";
+    signalReadyAt = performance.now();
+    signalStatus.textContent = "Signal live — press now.";
+    signalPressButton.focus({ preventScroll: true });
+  }, waitMs);
+}
+
+function pressSignalSprint() {
+  if (signalSprintState === "waiting") {
+    finishSignalSprint("Too early. Start another run when you are ready.");
+    return;
+  }
+
+  if (signalSprintState !== "ready" || signalReadyAt === null) {
+    return;
+  }
+
+  const reactionMs = Math.max(1, Math.round(performance.now() - signalReadyAt));
+  const previousBest = readGameBest(SIGNAL_SPRINT_KEY, "bestMs");
+  const isNewBest = !previousBest || reactionMs < previousBest;
+  if (isNewBest) {
+    safeSet(SIGNAL_SPRINT_KEY, JSON.stringify({ version: 1, bestMs: reactionMs }));
+    updateSignalBest();
+  }
+
+  finishSignalSprint(`${reactionMs} ms. ${isNewBest ? "That is your local best." : "Your saved best is still shown above."}`);
+}
+
+function shuffle(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function renderDeskGrid() {
+  deskGrid.replaceChildren();
+
+  deskGridState.cards.forEach((card, index) => {
+    const isRevealed = card.revealed || card.matched;
+    const cardButton = document.createElement("button");
+    cardButton.type = "button";
+    cardButton.className = "desk-grid-card";
+    cardButton.dataset.revealed = String(isRevealed);
+    cardButton.dataset.matched = String(card.matched);
+    cardButton.disabled = deskGridState.locked || card.matched;
+    cardButton.textContent = isRevealed ? card.symbol : "?";
+    cardButton.setAttribute(
+      "aria-label",
+      isRevealed
+        ? `${card.name}${card.matched ? ", matched" : ", revealed"}`
+        : `Hidden Desk Grid tile ${index + 1}`,
+    );
+    cardButton.addEventListener("click", () => chooseDeskGridCard(index));
+    deskGrid.append(cardButton);
+  });
+}
+
+function createDeskGrid() {
+  if (deskGridState.mismatchTimer) {
+    window.clearTimeout(deskGridState.mismatchTimer);
+  }
+
+  deskGridState = {
+    cards: shuffle(DESK_GRID_PAIRS.flatMap((pair, pairIndex) => [
+      { ...pair, id: `${pairIndex}-a`, revealed: false, matched: false },
+      { ...pair, id: `${pairIndex}-b`, revealed: false, matched: false },
+    ])),
+    firstIndex: null,
+    locked: false,
+    attempts: 0,
+    matches: 0,
+    mismatchTimer: null,
+  };
+
+  deskGridStatus.textContent = "New board ready. Match the six pairs in as few turns as you can.";
+  renderDeskGrid();
+}
+
+function finishDeskGrid() {
+  const previousBest = readGameBest(DESK_GRID_KEY, "bestAttempts");
+  const isNewBest = !previousBest || deskGridState.attempts < previousBest;
+  if (isNewBest) {
+    safeSet(DESK_GRID_KEY, JSON.stringify({ version: 1, bestAttempts: deskGridState.attempts }));
+    updateDeskGridBest();
+  }
+
+  deskGridStatus.textContent = `Board complete in ${deskGridState.attempts} turns. ${isNewBest ? "That is your local best." : "Try a new board to improve your local best."}`;
+}
+
+function hideDeskGridMismatch(firstIndex, secondIndex) {
+  deskGridState.cards[firstIndex].revealed = false;
+  deskGridState.cards[secondIndex].revealed = false;
+  deskGridState.firstIndex = null;
+  deskGridState.locked = false;
+  deskGridState.mismatchTimer = null;
+  deskGridStatus.textContent = `Not a pair. ${deskGridState.attempts} turn${deskGridState.attempts === 1 ? "" : "s"} so far.`;
+  renderDeskGrid();
+}
+
+function chooseDeskGridCard(index) {
+  const card = deskGridState.cards[index];
+  if (!card || deskGridState.locked || card.revealed || card.matched) {
+    return;
+  }
+
+  card.revealed = true;
+  if (deskGridState.firstIndex === null) {
+    deskGridState.firstIndex = index;
+    deskGridStatus.textContent = "Pick one more tile to check the pair.";
+    renderDeskGrid();
+    return;
+  }
+
+  const firstIndex = deskGridState.firstIndex;
+  const firstCard = deskGridState.cards[firstIndex];
+  deskGridState.attempts += 1;
+
+  if (firstCard.name === card.name) {
+    firstCard.matched = true;
+    card.matched = true;
+    deskGridState.firstIndex = null;
+    deskGridState.matches += 1;
+    if (deskGridState.matches === DESK_GRID_PAIRS.length) {
+      renderDeskGrid();
+      finishDeskGrid();
+      return;
+    }
+
+    deskGridStatus.textContent = `Pair found. ${DESK_GRID_PAIRS.length - deskGridState.matches} pair${DESK_GRID_PAIRS.length - deskGridState.matches === 1 ? "" : "s"} left.`;
+    renderDeskGrid();
+    return;
+  }
+
+  deskGridState.locked = true;
+  deskGridStatus.textContent = "Not a pair. Turning both tiles back over.";
+  renderDeskGrid();
+  deskGridState.mismatchTimer = window.setTimeout(() => hideDeskGridMismatch(firstIndex, index), 650);
+}
+
+function stopDeskGridTransition() {
+  if (deskGridState.mismatchTimer) {
+    window.clearTimeout(deskGridState.mismatchTimer);
+  }
+
+  const hadOpenPair = deskGridState.firstIndex !== null || deskGridState.locked;
+  deskGridState.cards.forEach((card) => {
+    if (!card.matched) {
+      card.revealed = false;
+    }
+  });
+  deskGridState.firstIndex = null;
+  deskGridState.locked = false;
+  deskGridState.mismatchTimer = null;
+  if (hadOpenPair) {
+    deskGridStatus.textContent = "The unfinished turn was reset when Game Room was hidden.";
+  }
+  renderDeskGrid();
+}
+
+function stopGames() {
+  const signalWasRunning = signalSprintState !== "idle";
+  if (signalSprintTimer) {
+    window.clearTimeout(signalSprintTimer);
+    signalSprintTimer = null;
+  }
+  if (signalWasRunning) {
+    signalSprintState = "idle";
+    signalReadyAt = null;
+    signalStartButton.textContent = "Start signal run";
+    signalPressButton.disabled = true;
+    signalStatus.textContent = "The unfinished signal run stopped when Game Room was hidden.";
+  }
+  stopDeskGridTransition();
+}
+
+function initializeGames() {
+  updateSignalBest();
+  updateDeskGridBest();
+  createDeskGrid();
 }
 
 function updateClock() {
@@ -904,6 +1172,9 @@ function bindGlobalControls() {
   performanceModeToggle.addEventListener("click", () => {
     setPerformanceMode(document.body.dataset.performanceMode !== "true", { announceMode: true });
   });
+  signalStartButton.addEventListener("click", startSignalSprint);
+  signalPressButton.addEventListener("click", pressSignalSprint);
+  deskGridNewButton.addEventListener("click", createDeskGrid);
   document.querySelector("#open-command-dock").addEventListener("click", (event) => openCommandDock(event.currentTarget));
   document.querySelector("#close-command-dock").addEventListener("click", closeCommandDock);
   document.querySelector("#save-workspace").addEventListener("click", () => persistLayout({ announceSave: true }));
@@ -1011,6 +1282,7 @@ function initialize() {
   initializePerformanceMode();
   renderProjects();
   initializeWritingTools();
+  initializeGames();
   applyLayout();
   bindWindowControls();
   bindGlobalControls();

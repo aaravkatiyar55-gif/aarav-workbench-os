@@ -268,6 +268,7 @@ kbd {
 .window-themes { width: min(26rem, calc(100% - 1.5rem)); }
 .window-notebook { width: min(24rem, calc(100% - 1.5rem)); }
 .window-journal { width: min(26rem, calc(100% - 1.5rem)); }
+.window-games { width: min(29rem, calc(100% - 1.5rem)); }
 .window-snapshot { width: min(23rem, calc(100% - 1.5rem)); }
 .window-projects .window-body {
   max-height: min(29rem, calc(100vh - var(--topbar-height) - var(--dock-height) - 2.8rem));
@@ -429,6 +430,62 @@ kbd {
 .wallpaper-field input { width: 100%; color: var(--ink); font-size: 0.78rem; }
 .theme-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
+.games-body { display: grid; gap: 0.8rem; }
+.games-body h2 { margin-bottom: 0; }
+.game-card {
+  display: grid;
+  gap: 0.62rem;
+  padding: 0.78rem;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 45%, var(--window));
+}
+.game-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.game-label {
+  margin: 0;
+  color: var(--teal);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.game-heading h3 { margin: 0.2rem 0 0; font-size: 1rem; }
+.game-score {
+  flex: 0 0 auto;
+  padding: 0.22rem 0.4rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.game-status {
+  min-height: 2.9rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.game-actions { display: flex; flex-wrap: wrap; gap: 0.48rem; }
+.desk-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.42rem; }
+.desk-grid-card {
+  display: grid;
+  min-height: 2.75rem;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.18rem;
+  font-weight: 900;
+}
+.desk-grid-card:hover:not(:disabled) { border-color: var(--teal); background: color-mix(in srgb, var(--teal) 10%, var(--paper)); }
+.desk-grid-card[data-revealed="true"] { border-color: var(--teal); background: color-mix(in srgb, var(--teal) 16%, var(--paper)); }
+.desk-grid-card[data-matched="true"] { border-color: var(--signal); color: var(--signal-deep); opacity: 1; }
+
 .dock {
   position: relative;
   z-index: 900;
@@ -524,6 +581,8 @@ kbd {
   .window-heading-row { flex-direction: column; }
   .project-meta { align-items: flex-start; flex-direction: column; }
   .theme-grid { grid-template-columns: 1fr; }
+  .game-heading { align-items: flex-start; flex-direction: column; }
+  .desk-grid { gap: 0.36rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
