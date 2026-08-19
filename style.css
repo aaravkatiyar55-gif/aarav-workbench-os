@@ -46,12 +46,13 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-button, input { font: inherit; }
+button, input, textarea { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: 0.6; }
 
 button:focus-visible,
 input:focus-visible,
+textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
@@ -226,6 +227,8 @@ kbd {
 .window-projects { width: min(27rem, calc(100% - 1.5rem)); }
 .window-notes { width: min(22rem, calc(100% - 1.5rem)); }
 .window-toolbox { width: min(23rem, calc(100% - 1.5rem)); }
+.window-notebook { width: min(24rem, calc(100% - 1.5rem)); }
+.window-journal { width: min(26rem, calc(100% - 1.5rem)); }
 .window-snapshot { width: min(23rem, calc(100% - 1.5rem)); }
 .window-projects .window-body {
   max-height: min(29rem, calc(100vh - var(--topbar-height) - var(--dock-height) - 2.8rem));
@@ -316,6 +319,49 @@ kbd {
 .tool-list span { color: var(--muted); font-size: 0.82rem; }
 .tool-list strong { font-size: 0.88rem; text-align: right; }
 
+.writing-body { display: grid; gap: 0.72rem; }
+.writing-body h2 { margin-bottom: 0; }
+.writing-body .writing-intro { margin: 0; }
+.writing-field {
+  display: grid;
+  gap: 0.32rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.writing-field input,
+.writing-field textarea {
+  width: 100%;
+  padding: 0.64rem 0.68rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.45;
+}
+.writing-field textarea { min-height: 8rem; resize: vertical; }
+.writing-field input::placeholder,
+.writing-field textarea::placeholder { color: var(--muted); opacity: 0.9; }
+.writing-actions,
+.voice-controls,
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.writing-actions { justify-content: space-between; border-top: 1px solid var(--line); padding-top: 0.72rem; }
+.save-status { flex: 1 1 12rem; margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
+.danger-button {
+  padding: 0.58rem 0.72rem;
+  border: 2px solid var(--signal-deep);
+  border-radius: var(--radius);
+  background: var(--signal);
+  color: #fffdf7;
+  font-weight: 800;
+}
+.danger-button:hover { background: var(--signal-deep); }
+
 .dock {
   position: relative;
   z-index: 900;
@@ -364,6 +410,21 @@ kbd {
 .command-result[data-active="true"] { border-color: var(--teal); background: color-mix(in srgb, var(--teal) 10%, var(--paper)); }
 .command-result small { color: var(--muted); }
 .dialog-help { margin: 0; padding: 0.75rem 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.76rem; }
+
+.confirm-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--window);
+  color: var(--ink);
+  box-shadow: 8px 9px 0 var(--window-shadow);
+}
+.confirm-dialog::backdrop { background: rgba(20, 30, 29, 0.46); }
+.confirm-dialog-body { padding: 1.1rem; }
+.confirm-dialog-body h2 { margin: 0.3rem 0 0.55rem; letter-spacing: -0.03em; }
+.confirm-dialog-body > p:not(.window-kicker) { color: var(--muted); line-height: 1.5; }
+.confirm-actions { justify-content: flex-end; margin-top: 1rem; }
 
 @media (max-width: 860px) {
   .topbar { align-items: flex-start; gap: 0.75rem; }

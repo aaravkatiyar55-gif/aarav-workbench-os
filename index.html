@@ -169,6 +169,81 @@
       </section>
 
       <section
+        id="notebook-window"
+        class="os-window window-notebook"
+        data-window-id="notebook"
+        data-default-x="454"
+        data-default-y="432"
+        data-start-minimized="true"
+        aria-labelledby="notebook-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Notebook window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
+          <span id="notebook-title" class="window-title">Notebook</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Notebook">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Notebook">×</button>
+          </span>
+        </header>
+        <div class="window-body writing-body">
+          <p class="window-kicker">Private local tool</p>
+          <h2>Leave yourself a useful note.</h2>
+          <p class="small-note writing-intro">Saved only in this browser while you type. It is not shared with Aarav or anyone else.</p>
+          <label class="writing-field" for="notebook-title-input">
+            <span>Note title</span>
+            <input id="notebook-title-input" type="text" maxlength="120" placeholder="e.g. Things to improve next" autocomplete="off" />
+          </label>
+          <label class="writing-field" for="notebook-body-input">
+            <span>Note</span>
+            <textarea id="notebook-body-input" rows="6" maxlength="6000" placeholder="Write a thought, a plan, or a small reminder…"></textarea>
+          </label>
+          <div class="writing-actions">
+            <button id="clear-notebook" class="quiet-button" type="button">Clear notebook</button>
+            <p id="notebook-status" class="save-status" aria-live="polite">Nothing has been written yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="journal-window"
+        class="os-window window-journal"
+        data-window-id="journal"
+        data-default-x="840"
+        data-default-y="424"
+        data-start-minimized="true"
+        aria-labelledby="journal-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Story Journal window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
+          <span id="journal-title" class="window-title">Story Journal</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Story Journal">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Story Journal">×</button>
+          </span>
+        </header>
+        <div class="window-body writing-body">
+          <p class="window-kicker">Private local draft</p>
+          <h2>Write a little of your story.</h2>
+          <p class="small-note writing-intro">This stays in this browser. It does not create a profile, match people, or publish anything.</p>
+          <label class="writing-field" for="journal-input">
+            <span>Your draft</span>
+            <textarea id="journal-input" rows="8" maxlength="12000" placeholder="A small memory, an idea, or something you want to remember…"></textarea>
+          </label>
+          <div class="voice-controls">
+            <button id="start-dictation" class="quiet-button" type="button">Start voice input</button>
+            <button id="stop-dictation" class="quiet-button" type="button" disabled>Stop voice input</button>
+          </div>
+          <p id="voice-status" class="save-status" role="status">Typing is always available. Voice input depends on this browser.</p>
+          <div class="writing-actions">
+            <button id="clear-journal" class="quiet-button" type="button">Clear journal</button>
+            <p id="journal-status" class="save-status" aria-live="polite">Nothing has been written yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
         id="snapshot-window"
         class="os-window window-snapshot"
         data-window-id="snapshot"
@@ -212,6 +287,12 @@
       <button type="button" class="dock-item" data-open-window="toolbox" aria-label="Open Toolbox">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Tools</span>
       </button>
+      <button type="button" class="dock-item" data-open-window="notebook" aria-label="Open Notebook">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Notebook</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="journal" aria-label="Open Story Journal">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Journal</span>
+      </button>
       <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>
       </button>
@@ -231,6 +312,18 @@
       </label>
       <div id="command-results" class="command-results" role="listbox" aria-label="Available commands"></div>
       <p class="dialog-help"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> run <kbd>Esc</kbd> close</p>
+    </dialog>
+
+    <dialog id="clear-data-dialog" class="confirm-dialog" aria-labelledby="clear-data-title" aria-describedby="clear-data-description">
+      <div class="confirm-dialog-body">
+        <p class="window-kicker">Local browser data</p>
+        <h2 id="clear-data-title">Clear saved writing?</h2>
+        <p id="clear-data-description">This removes only the selected Workbench writing draft from this browser.</p>
+        <div class="confirm-actions">
+          <button id="cancel-clear-data" class="quiet-button" type="button">Keep it</button>
+          <button id="confirm-clear-data" class="danger-button" type="button">Clear draft</button>
+        </div>
+      </div>
     </dialog>
 
     <script type="module" src="script.js"></script>

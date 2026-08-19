@@ -3,6 +3,8 @@ import { projects } from "./projects.js";
 const STORAGE_PREFIX = "aarav-workbench-os";
 const LAYOUT_KEY = `${STORAGE_PREFIX}.layout.v1`;
 const THEME_KEY = `${STORAGE_PREFIX}.theme.v1`;
+const NOTEBOOK_KEY = `${STORAGE_PREFIX}.notebook.v1`;
+const JOURNAL_KEY = `${STORAGE_PREFIX}.journal.v1`;
 const LAYOUT_VERSION = 1;
 const MOVE_STEP = 24;
 
@@ -17,6 +19,19 @@ const projectSearch = document.querySelector("#project-search");
 const projectList = document.querySelector("#project-list");
 const projectCount = document.querySelector("#project-count");
 const layoutSummary = document.querySelector("#layout-summary");
+const notebookTitleInput = document.querySelector("#notebook-title-input");
+const notebookBodyInput = document.querySelector("#notebook-body-input");
+const notebookStatus = document.querySelector("#notebook-status");
+const journalInput = document.querySelector("#journal-input");
+const journalStatus = document.querySelector("#journal-status");
+const voiceStatus = document.querySelector("#voice-status");
+const startDictationButton = document.querySelector("#start-dictation");
+const stopDictationButton = document.querySelector("#stop-dictation");
+const clearDataDialog = document.querySelector("#clear-data-dialog");
+const clearDataTitle = document.querySelector("#clear-data-title");
+const clearDataDescription = document.querySelector("#clear-data-description");
+const confirmClearDataButton = document.querySelector("#confirm-clear-data");
+const cancelClearDataButton = document.querySelector("#cancel-clear-data");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -25,6 +40,10 @@ let activeWindowId = "welcome";
 let activeCommandIndex = 0;
 let previousFocusedElement = null;
 let storageWarningShown = false;
+let clearDataTarget = null;
+let clearDataTrigger = null;
+let speechRecognition = null;
+let isDictating = false;
 
 function isMobileLayout() {
   return window.matchMedia("(max-width: 767px)").matches;
@@ -230,6 +249,9 @@ function minimizeWindow(windowElement) {
   if (windowElement.hidden) {
     return;
   }
+  if (windowElement.dataset.windowId === "journal") {
+    stopDictation();
+  }
   windowElement.dataset.minimized = "true";
   updateDockItem(windowElement);
   persistLayout();
@@ -238,6 +260,9 @@ function minimizeWindow(windowElement) {
 }
 
 function closeWindow(windowElement) {
+  if (windowElement.dataset.windowId === "journal") {
+    stopDictation();
+  }
   windowElement.hidden = true;
   windowElement.dataset.minimized = "false";
   updateDockItem(windowElement);
@@ -313,6 +338,200 @@ function updateClock() {
     hour: "2-digit",
     minute: "2-digit",
   }).format(now);
+}
+
+function asString(value, fallback = "") {
+  return typeof value === "string" ? value : fallback;
+}
+
+function formatLocalSaveTime(value) {
+  const savedAt = new Date(value);
+  if (Number.isNaN(savedAt.getTime())) {
+    return "Saved locally in this browser.";
+  }
+
+  return `Saved locally at ${new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(savedAt)}.`;
+}
+
+function readWritingDraft(key, fields) {
+  const rawDraft = safeGet(key);
+  if (!rawDraft) {
+    return { ...fields, updatedAt: null };
+  }
+
+  try {
+    const parsed = JSON.parse(rawDraft);
+    if (parsed?.version !== 1 || typeof parsed !== "object") {
+      return { ...fields, updatedAt: null };
+    }
+
+    return {
+      ...Object.fromEntries(Object.keys(fields).map((field) => [field, asString(parsed[field], fields[field])])),
+      updatedAt: typeof parsed.updatedAt === "string" && !Number.isNaN(Date.parse(parsed.updatedAt)) ? parsed.updatedAt : null,
+    };
+  } catch {
+    return { ...fields, updatedAt: null };
+  }
+}
+
+function updateWritingStatus(statusElement, hasText, updatedAt, emptyMessage) {
+  statusElement.textContent = hasText && updatedAt ? formatLocalSaveTime(updatedAt) : emptyMessage;
+}
+
+function saveNotebook() {
+  const title = notebookTitleInput.value.slice(0, notebookTitleInput.maxLength);
+  const body = notebookBodyInput.value.slice(0, notebookBodyInput.maxLength);
+  const updatedAt = new Date().toISOString();
+  const saved = safeSet(NOTEBOOK_KEY, JSON.stringify({ version: 1, title, body, updatedAt }));
+  updateWritingStatus(notebookStatus, saved, updatedAt, "This browser cannot save the notebook right now.");
+}
+
+function saveJournal() {
+  const body = journalInput.value.slice(0, journalInput.maxLength);
+  const updatedAt = new Date().toISOString();
+  const saved = safeSet(JOURNAL_KEY, JSON.stringify({ version: 1, body, updatedAt }));
+  updateWritingStatus(journalStatus, saved, updatedAt, "This browser cannot save the journal right now.");
+}
+
+function initializeWritingTools() {
+  const notebook = readWritingDraft(NOTEBOOK_KEY, { title: "", body: "" });
+  notebookTitleInput.value = notebook.title;
+  notebookBodyInput.value = notebook.body;
+  updateWritingStatus(notebookStatus, Boolean(notebook.title.trim() || notebook.body.trim()), notebook.updatedAt, "Nothing has been written yet.");
+
+  const journal = readWritingDraft(JOURNAL_KEY, { body: "" });
+  journalInput.value = journal.body;
+  updateWritingStatus(journalStatus, Boolean(journal.body.trim()), journal.updatedAt, "Nothing has been written yet.");
+}
+
+function openClearDataDialog(target, trigger) {
+  clearDataTarget = target;
+  clearDataTrigger = trigger instanceof HTMLElement ? trigger : null;
+
+  if (target === "notebook") {
+    clearDataTitle.textContent = "Clear this notebook?";
+    clearDataDescription.textContent = "This removes only this saved Workbench notebook from this browser.";
+  } else {
+    clearDataTitle.textContent = "Clear this story journal?";
+    clearDataDescription.textContent = "This removes only this saved Workbench journal from this browser.";
+  }
+
+  clearDataDialog.showModal();
+  cancelClearDataButton.focus();
+}
+
+function closeClearDataDialog() {
+  if (clearDataDialog.open) {
+    clearDataDialog.close();
+  }
+}
+
+function clearSelectedWriting() {
+  if (clearDataTarget === "notebook") {
+    notebookTitleInput.value = "";
+    notebookBodyInput.value = "";
+    safeRemove(NOTEBOOK_KEY);
+    updateWritingStatus(notebookStatus, false, null, "Notebook cleared from this browser.");
+    announce("Notebook cleared from this browser.");
+  }
+
+  if (clearDataTarget === "journal") {
+    journalInput.value = "";
+    safeRemove(JOURNAL_KEY);
+    updateWritingStatus(journalStatus, false, null, "Journal cleared from this browser.");
+    announce("Story journal cleared from this browser.");
+  }
+
+  closeClearDataDialog();
+}
+
+function setDictationState(nextState, message) {
+  isDictating = nextState;
+  startDictationButton.disabled = nextState;
+  stopDictationButton.disabled = !nextState;
+  voiceStatus.textContent = message;
+}
+
+function appendDictation(text) {
+  const cleanedText = text.trim();
+  if (!cleanedText) {
+    return;
+  }
+
+  const needsSpace = journalInput.value && !/\s$/.test(journalInput.value);
+  journalInput.value = `${journalInput.value}${needsSpace ? " " : ""}${cleanedText}`.slice(0, journalInput.maxLength);
+  saveJournal();
+}
+
+function configureSpeechRecognition() {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) {
+    return null;
+  }
+
+  const recognition = new Recognition();
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = document.documentElement.lang || navigator.language || "en-US";
+
+  recognition.addEventListener("result", (event) => {
+    let transcript = "";
+    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      if (event.results[index].isFinal) {
+        transcript += event.results[index][0].transcript;
+      }
+    }
+    appendDictation(transcript);
+    if (transcript.trim()) {
+      voiceStatus.textContent = "Added the latest spoken words to the local journal draft.";
+    }
+  });
+
+  recognition.addEventListener("error", (event) => {
+    const messages = {
+      "not-allowed": "Microphone permission was not granted. You can keep typing instead.",
+      "service-not-allowed": "Voice input is not available in this browser. You can keep typing instead.",
+      "no-speech": "No speech was heard. Try again or keep typing instead.",
+      "audio-capture": "No microphone was available. You can keep typing instead.",
+    };
+    setDictationState(false, messages[event.error] || "Voice input stopped. You can keep typing instead.");
+  });
+
+  recognition.addEventListener("end", () => {
+    if (isDictating) {
+      setDictationState(false, "Voice input ended. Your local journal is still available to edit.");
+    }
+  });
+
+  return recognition;
+}
+
+function startDictation() {
+  if (!speechRecognition) {
+    speechRecognition = configureSpeechRecognition();
+  }
+
+  if (!speechRecognition) {
+    voiceStatus.textContent = "Voice input is not supported here. You can keep typing instead.";
+    return;
+  }
+
+  try {
+    setDictationState(true, "Listening… spoken words will be added to this local draft.");
+    speechRecognition.start();
+  } catch {
+    setDictationState(false, "Voice input could not start. You can keep typing instead.");
+  }
+}
+
+function stopDictation() {
+  if (speechRecognition && isDictating) {
+    speechRecognition.stop();
+  }
+  setDictationState(false, "Voice input stopped. You can keep typing instead.");
 }
 
 function renderProjects(query = "") {
@@ -551,6 +770,21 @@ function bindGlobalControls() {
   document.querySelector("#save-workspace").addEventListener("click", () => persistLayout({ announceSave: true }));
   document.querySelector("#reset-layout").addEventListener("click", resetLayout);
 
+  notebookTitleInput.addEventListener("input", saveNotebook);
+  notebookBodyInput.addEventListener("input", saveNotebook);
+  journalInput.addEventListener("input", saveJournal);
+  document.querySelector("#clear-notebook").addEventListener("click", (event) => openClearDataDialog("notebook", event.currentTarget));
+  document.querySelector("#clear-journal").addEventListener("click", (event) => openClearDataDialog("journal", event.currentTarget));
+  startDictationButton.addEventListener("click", startDictation);
+  stopDictationButton.addEventListener("click", stopDictation);
+  cancelClearDataButton.addEventListener("click", closeClearDataDialog);
+  confirmClearDataButton.addEventListener("click", clearSelectedWriting);
+  clearDataDialog.addEventListener("close", () => {
+    clearDataTrigger?.focus({ preventScroll: true });
+    clearDataTarget = null;
+    clearDataTrigger = null;
+  });
+
   projectSearch.addEventListener("input", () => renderProjects(projectSearch.value));
   commandSearch.addEventListener("input", () => {
     activeCommandIndex = 0;
@@ -634,6 +868,7 @@ function bindGlobalControls() {
 function initialize() {
   initializeTheme();
   renderProjects();
+  initializeWritingTools();
   applyLayout();
   bindWindowControls();
   bindGlobalControls();
