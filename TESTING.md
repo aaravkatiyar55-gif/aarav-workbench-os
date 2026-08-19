@@ -16,4 +16,4 @@ This file records observed results only. A planned check is not a pass.
 | Runtime console | Local browser | Passed | Browser error log was empty after the interaction checks. |
 | Project Shelf links | Local network check | Passed | Seven listed source/demo URLs returned HTTP 200; Aarav Ping Bot is intentionally source-only. |
 | Responsive layout | Source + local browser | Partially checked | Mobile stacking and reduced-motion media rules are source-checked. The test browser did not apply its requested 360/768/1280/1440 viewport override, so those exact runtime widths remain pending. |
-| Deployed website | Public GitHub Pages | Pending | Fresh-page check after deployment. |
+| Deployed website | Public GitHub Pages | Passed | Fresh-cache release check confirmed the page, Project Shelf scroll fit, Command Dock, theme persistence, pointer drag, and an empty browser error log. |
