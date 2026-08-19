@@ -13,6 +13,7 @@ const STREAK_KEY = `${STORAGE_PREFIX}.streak.v1`;
 const LAYOUT_VERSION = 1;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
+const MAX_CONSOLE_LINES = 100;
 const THEMES = {
   paper: "Paper",
   night: "Night",
@@ -88,6 +89,7 @@ let deskGridState = {
   matches: 0,
   mismatchTimer: null,
 };
+let currentStreak = { count: 0, lastCheckIn: null };
 
 const DESK_GRID_PAIRS = [
   { symbol: "▲", name: "triangle" },
@@ -137,11 +139,13 @@ function safeSet(key, value) {
 function safeRemove(key) {
   try {
     window.localStorage.removeItem(key);
+    return true;
   } catch {
     if (!storageWarningShown) {
       storageWarningShown = true;
       announce("This browser cannot clear the saved workspace right now.");
     }
+    return false;
   }
 }
 
@@ -359,7 +363,7 @@ function applyLayout() {
 }
 
 function resetLayout() {
-  safeRemove(LAYOUT_KEY);
+  const layoutRemoved = safeRemove(LAYOUT_KEY);
 
   windowElements.forEach((windowElement, index) => {
     const fallback = defaultWindowState(windowElement);
@@ -372,7 +376,9 @@ function resetLayout() {
   topZIndex = windowElements.length + 1;
   updateAllDockItems();
   updateLayoutSummary();
-  announce("Default workspace layout restored. Your theme was kept.");
+  announce(layoutRemoved
+    ? "Default workspace layout restored. Your theme was kept."
+    : "Default layout is shown for this visit, but the saved layout could not be cleared.");
 }
 
 function normalizeTheme(theme) {
@@ -477,19 +483,22 @@ function removeCustomWallpaper({ announceRemoval = false } = {}) {
 
 function setTemporaryWallpaper(file) {
   const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+  const existingWallpaperNotice = customWallpaperUrl
+    ? " Your current temporary wallpaper is still active."
+    : " No wallpaper was applied.";
   if (!file) {
     return;
   }
 
   if (!allowedTypes.has(file.type)) {
     wallpaperInput.value = "";
-    wallpaperStatus.textContent = "Choose a PNG, JPEG, or WebP image. No file was used.";
+    wallpaperStatus.textContent = `Choose a PNG, JPEG, or WebP image.${existingWallpaperNotice}`;
     return;
   }
 
   if (file.size > MAX_WALLPAPER_BYTES) {
     wallpaperInput.value = "";
-    wallpaperStatus.textContent = "Choose an image smaller than 4 MB. No file was used.";
+    wallpaperStatus.textContent = `Choose an image smaller than 4 MB.${existingWallpaperNotice}`;
     return;
   }
 
@@ -572,12 +581,20 @@ function pressSignalSprint() {
   const reactionMs = Math.max(1, Math.round(performance.now() - signalReadyAt));
   const previousBest = readGameBest(SIGNAL_SPRINT_KEY, "bestMs");
   const isNewBest = !previousBest || reactionMs < previousBest;
+  let bestWasSaved = false;
   if (isNewBest) {
-    safeSet(SIGNAL_SPRINT_KEY, JSON.stringify({ version: 1, bestMs: reactionMs }));
-    updateSignalBest();
+    bestWasSaved = safeSet(SIGNAL_SPRINT_KEY, JSON.stringify({ version: 1, bestMs: reactionMs }));
+    if (bestWasSaved) {
+      updateSignalBest();
+    }
   }
 
-  finishSignalSprint(`${reactionMs} ms. ${isNewBest ? "That is your local best." : "Your saved best is still shown above."}`);
+  const resultMessage = isNewBest
+    ? bestWasSaved
+      ? "That is your local best."
+      : "This was a strong run, but this browser could not save a local best."
+    : "Your saved best is still shown above.";
+  finishSignalSprint(`${reactionMs} ms. ${resultMessage}`);
 }
 
 function shuffle(items) {
@@ -589,7 +606,12 @@ function shuffle(items) {
   return shuffled;
 }
 
-function renderDeskGrid() {
+function nextAvailableDeskGridIndex(startIndex = 0) {
+  const afterStart = deskGridState.cards.findIndex((card, index) => index >= startIndex && !card.matched);
+  return afterStart >= 0 ? afterStart : deskGridState.cards.findIndex((card) => !card.matched);
+}
+
+function renderDeskGrid({ focusIndex = null } = {}) {
   deskGrid.replaceChildren();
 
   deskGridState.cards.forEach((card, index) => {
@@ -599,6 +621,7 @@ function renderDeskGrid() {
     cardButton.className = "desk-grid-card";
     cardButton.dataset.revealed = String(isRevealed);
     cardButton.dataset.matched = String(card.matched);
+    cardButton.dataset.deskIndex = String(index);
     cardButton.disabled = deskGridState.locked || card.matched;
     cardButton.textContent = isRevealed ? card.symbol : "?";
     cardButton.setAttribute(
@@ -610,6 +633,11 @@ function renderDeskGrid() {
     cardButton.addEventListener("click", () => chooseDeskGridCard(index));
     deskGrid.append(cardButton);
   });
+
+  if (Number.isInteger(focusIndex)) {
+    const nextFocus = deskGrid.querySelector(`[data-desk-index="${focusIndex}"]:not(:disabled)`);
+    nextFocus?.focus({ preventScroll: true });
+  }
 }
 
 function createDeskGrid() {
@@ -636,12 +664,20 @@ function createDeskGrid() {
 function finishDeskGrid() {
   const previousBest = readGameBest(DESK_GRID_KEY, "bestAttempts");
   const isNewBest = !previousBest || deskGridState.attempts < previousBest;
+  let bestWasSaved = false;
   if (isNewBest) {
-    safeSet(DESK_GRID_KEY, JSON.stringify({ version: 1, bestAttempts: deskGridState.attempts }));
-    updateDeskGridBest();
+    bestWasSaved = safeSet(DESK_GRID_KEY, JSON.stringify({ version: 1, bestAttempts: deskGridState.attempts }));
+    if (bestWasSaved) {
+      updateDeskGridBest();
+    }
   }
 
-  deskGridStatus.textContent = `Board complete in ${deskGridState.attempts} turns. ${isNewBest ? "That is your local best." : "Try a new board to improve your local best."}`;
+  const completionMessage = isNewBest
+    ? bestWasSaved
+      ? "That is your local best."
+      : "This browser could not save a local best."
+    : "Try a new board to improve your local best.";
+  deskGridStatus.textContent = `Board complete in ${deskGridState.attempts} turns. ${completionMessage}`;
 }
 
 function hideDeskGridMismatch(firstIndex, secondIndex) {
@@ -651,7 +687,7 @@ function hideDeskGridMismatch(firstIndex, secondIndex) {
   deskGridState.locked = false;
   deskGridState.mismatchTimer = null;
   deskGridStatus.textContent = `Not a pair. ${deskGridState.attempts} turn${deskGridState.attempts === 1 ? "" : "s"} so far.`;
-  renderDeskGrid();
+  renderDeskGrid({ focusIndex: firstIndex });
 }
 
 function chooseDeskGridCard(index) {
@@ -664,7 +700,7 @@ function chooseDeskGridCard(index) {
   if (deskGridState.firstIndex === null) {
     deskGridState.firstIndex = index;
     deskGridStatus.textContent = "Pick one more tile to check the pair.";
-    renderDeskGrid();
+    renderDeskGrid({ focusIndex: index });
     return;
   }
 
@@ -680,11 +716,12 @@ function chooseDeskGridCard(index) {
     if (deskGridState.matches === DESK_GRID_PAIRS.length) {
       renderDeskGrid();
       finishDeskGrid();
+      deskGridNewButton.focus({ preventScroll: true });
       return;
     }
 
     deskGridStatus.textContent = `Pair found. ${DESK_GRID_PAIRS.length - deskGridState.matches} pair${DESK_GRID_PAIRS.length - deskGridState.matches === 1 ? "" : "s"} left.`;
-    renderDeskGrid();
+    renderDeskGrid({ focusIndex: nextAvailableDeskGridIndex(index + 1) });
     return;
   }
 
@@ -774,16 +811,16 @@ function readSavedStreak() {
   }
 }
 
-function updateStreakUI(streak = readSavedStreak()) {
+function updateStreakUI(streak = currentStreak, { isSaved = true } = {}) {
   streakCount.textContent = `${streak.count} day${streak.count === 1 ? "" : "s"}`;
   streakStatus.textContent = streak.count
-    ? `${streak.count}-day local check-in streak. It records local Workbench use only, not coding time.`
+    ? `${streak.count}-day local check-in streak. It records local Workbench use only, not coding time.${isSaved ? "" : " This browser could not save it after refresh."}`
     : "Open a local Workbench tool to begin a local check-in streak.";
 }
 
 function recordLocalCheckIn() {
   const today = localDateKey();
-  const previous = readSavedStreak();
+  const previous = currentStreak;
   const daysSincePrevious = previous.lastCheckIn ? dateDistanceInDays(previous.lastCheckIn, today) : null;
   let nextCount = previous.count;
 
@@ -799,13 +836,14 @@ function recordLocalCheckIn() {
   }
 
   const nextStreak = { version: 1, count: nextCount, lastCheckIn: today };
-  if (safeSet(STREAK_KEY, JSON.stringify(nextStreak))) {
-    updateStreakUI(nextStreak);
-  }
+  const saved = safeSet(STREAK_KEY, JSON.stringify(nextStreak));
+  currentStreak = nextStreak;
+  updateStreakUI(nextStreak, { isSaved: saved });
 }
 
 function initializeLocalActivity() {
-  updateStreakUI();
+  currentStreak = readSavedStreak();
+  updateStreakUI(currentStreak);
 }
 
 function appendConsoleLine(text, className = "") {
@@ -815,6 +853,9 @@ function appendConsoleLine(text, className = "") {
     line.className = className;
   }
   consoleOutput.append(line);
+  while (consoleOutput.children.length > MAX_CONSOLE_LINES) {
+    consoleOutput.firstElementChild?.remove();
+  }
   consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
 
@@ -997,18 +1038,26 @@ function closeClearDataDialog() {
 
 function clearSelectedWriting() {
   if (clearDataTarget === "notebook") {
-    notebookTitleInput.value = "";
-    notebookBodyInput.value = "";
-    safeRemove(NOTEBOOK_KEY);
-    updateWritingStatus(notebookStatus, false, null, "Notebook cleared from this browser.");
-    announce("Notebook cleared from this browser.");
+    if (safeRemove(NOTEBOOK_KEY)) {
+      notebookTitleInput.value = "";
+      notebookBodyInput.value = "";
+      updateWritingStatus(notebookStatus, false, null, "Notebook cleared from this browser.");
+      announce("Notebook cleared from this browser.");
+    } else {
+      notebookStatus.textContent = "Notebook could not be cleared because this browser cannot update saved data.";
+      announce("Notebook could not be cleared. Your text was kept in the editor.");
+    }
   }
 
   if (clearDataTarget === "journal") {
-    journalInput.value = "";
-    safeRemove(JOURNAL_KEY);
-    updateWritingStatus(journalStatus, false, null, "Journal cleared from this browser.");
-    announce("Story journal cleared from this browser.");
+    if (safeRemove(JOURNAL_KEY)) {
+      journalInput.value = "";
+      updateWritingStatus(journalStatus, false, null, "Journal cleared from this browser.");
+      announce("Story journal cleared from this browser.");
+    } else {
+      journalStatus.textContent = "Journal could not be cleared because this browser cannot update saved data.";
+      announce("Story journal could not be cleared. Your text was kept in the editor.");
+    }
   }
 
   closeClearDataDialog();

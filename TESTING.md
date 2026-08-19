@@ -4,16 +4,30 @@ This file records observed results only. A planned check is not a pass.
 
 | Area | Environment | Result | Notes |
 | --- | --- | --- | --- |
-| JavaScript syntax | Local | Passed | `npm run check` completed after the drag guard update. |
-| Whitespace / patch safety | Local | Passed | `git diff --check` completed with no output. |
-| Five draggable windows | Local browser | Passed | Each title bar was moved with a real pointer drag. A title-bar click was also checked not to move a window. |
-| Project Shelf desktop fit | Local browser | Passed | The shelf body scrolls within a capped window; at the tested desktop size its 509px window stayed inside the 696px desktop area. |
-| Close, minimize, restore | Local browser | Passed | Build Notes minimized then restored from the dock; Toolbox closed then restored from the dock. |
-| Clock and theme persistence | Local browser | Passed | Theme changed, page reloaded, and the saved paper theme was restored. The live clock was visible in the top bar. |
-| Workspace snapshot persistence | Local browser | Passed | A dragged Project Shelf position persisted in a fresh local browser page; Save workspace was activated. |
-| Command Dock | Local browser | Passed | `Ctrl` + `K`, command filtering, Enter to open Workspace Snapshot, and Escape to close were checked. |
-| Keyboard movement | Local browser | Passed | A focused Project Shelf title bar moved 24px right with `Alt` + Right Arrow while keeping its saved top value. |
-| Runtime console | Local browser | Passed | Browser error log was empty after the interaction checks. |
-| Project Shelf links | Local network check | Passed | Seven listed source/demo URLs returned HTTP 200; Aarav Ping Bot is intentionally source-only. |
-| Responsive layout | Source + local browser | Partially checked | Mobile stacking and reduced-motion media rules are source-checked. The test browser did not apply its requested 360/768/1280/1440 viewport override, so those exact runtime widths remain pending. |
-| Deployed website | Public GitHub Pages | Passed | Fresh-cache release check confirmed the page, Project Shelf scroll fit, Command Dock, theme persistence, pointer drag, and an empty browser error log. |
+| JavaScript syntax | Local | Passed | `npm run check` completed after the local-first expansion. |
+| Whitespace / patch safety | Local | Passed | `git diff --check` completed with no reported patch errors. |
+| Existing window desktop | Local browser | Passed earlier | Five foundational windows were pointer-dragged; close, minimize, dock restore, Command Dock, `Alt` + arrow movement, layout persistence, and a live clock were previously checked. |
+| Notebook persistence | Isolated local browser | Passed | A synthetic title and multiline note persisted through refresh in the `127.0.0.1:4176` test origin. |
+| Story Journal persistence | Isolated local browser | Passed | A synthetic non-personal draft persisted through refresh; it remained inside the Journal window only. |
+| Writing clear protection | Isolated local browser | Passed | The clear-notebook control opened the exact confirmation dialog; Keep it was selected and the saved content stayed unchanged. |
+| Optional voice fallback | Isolated local browser | Passed for denial fallback | Starting voice input showed the browser-denied fallback and typing remained available. No microphone permission was accepted and no real speech transcription is claimed. |
+| Theme Lab persistence and console contrast | Isolated local browser | Passed | Moss and quieter motion persisted through refresh; fresh Night-theme check showed the console on a dark fixed surface with distinct light, command, and error text. |
+| Legacy theme migration | Source review | Source-checked | Valid legacy Paper/Night values are migrated to `theme.v2`; malformed values fall back to Paper. A seeded legacy-browser runtime test remains pending. |
+| Session wallpaper | Source review | Source-checked | PNG/JPEG/WebP type and 4 MB limit are checked; image object URL is memory-only and revoked on reset/unload. A native file-picker selection was not performed, so picker behavior is not claimed. |
+| Wallpaper invalid-file message | Source review | Source-checked | An invalid or oversized selection leaves any current temporary wallpaper in place and the status says so; no selected file is retained. |
+| Signal Sprint | Isolated local browser | Passed for early, success, and cleanup flows | Too-early state, a measured successful reaction/best score, and stopping an unfinished run when Game Room was minimized were observed. |
+| Desk Grid | Isolated local browser | Passed for board, mismatch, match, and focus flows | Board rendered twelve labelled controls; a mismatch recovered after its delay, one matching pair was found, and focus moved to the relevant next card after re-render. A complete six-pair route is still pending. |
+| Game-score storage failure | Source review | Source-checked | A game says a local best was saved only when the namespaced browser-storage write succeeds; otherwise it explains that the result could not be saved. |
+| Workbench Console | Isolated local browser | Passed | `help`, `theme ember`, `open games`, `status`, `clear`, and unsupported shell-style input were checked through regular input/keyboard interaction. The visible Run button was also clicked for `status` and unsupported PowerShell-style input; the unsupported input produced a local rejection with no console error. |
+| Command Dock integration | Isolated local browser | Passed | Searching for Launchpad surfaced its Open command in the existing Command Dock. |
+| Local check-in streak | Isolated local browser | Passed | Opening local tools created a 1-day local streak and it remained 1 after refresh on the same date. It explicitly says it is not coding time; source behavior keeps the current-visit UI meaningful if browser storage fails. |
+| Launchpad URLs | Local browser DOM | Passed for link targets | YouTube, Facebook, and Instagram point to their official HTTPS sites with new-tab security attributes. They were not opened during test. |
+| Runtime console | Isolated local browser | Passed | Browser error and warning logs were empty after writing, themes, games, console, and streak checks. |
+| Responsive layout | Local browser | Passed | Real 360px, 768px, 1280px, and 1440px viewport overrides were checked. An initial 768px dock overflow was fixed; the final pass had no horizontal document overflow at any tested width. |
+| Deployed website | Public GitHub Pages | Passed for foundational release | The earlier foundation was fresh-cache checked. The expanded release requires a new post-push Pages and fresh-tab verification before it is marked deployed. |
+
+## Test boundaries
+
+- The local browser used an isolated `127.0.0.1:4176` origin with synthetic writing/game test data. It did not touch the public demo's browser storage.
+- No native wallpaper file was selected, no real voice transcription was accepted, and no personal content was used.
+- No screenshot upload, Stardance devlog, project-info change, community outreach, tracker action, or Ship action is represented by this file.

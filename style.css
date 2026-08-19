@@ -12,6 +12,10 @@
   --window: #fffdf7;
   --window-shadow: rgba(28, 41, 40, 0.2);
   --focus: #f6a634;
+  --console-surface: #142523;
+  --console-text: #fffdf7;
+  --console-command: #ffe3a7;
+  --console-error: #ffd5c2;
   --radius: 5px;
   --topbar-height: 72px;
   --dock-height: 76px;
@@ -518,15 +522,15 @@ kbd {
   overflow: auto;
   padding: 0.7rem;
   border: 2px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--console-surface);
+  color: var(--console-text);
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 0.8rem;
   line-height: 1.45;
 }
 .console-output p { margin: 0; }
-.console-output .console-input-line { color: var(--focus); }
-.console-output .console-error { color: #ffbd9f; }
+.console-output .console-input-line { color: var(--console-command); }
+.console-output .console-error { color: var(--console-error); }
 .console-output code { color: inherit; font: inherit; }
 .console-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
 .console-actions .small-note { margin: 0; }
@@ -623,6 +627,8 @@ kbd {
   .topbar-actions { flex-wrap: wrap; justify-content: flex-end; }
   .clock { min-width: 0; }
   .command-button kbd { display: none; }
+  .dock { overflow-x: auto; justify-content: flex-start; }
+  .dock-item { flex: 0 0 auto; min-width: 4.8rem; }
 }
 
 @media (max-width: 767px) {
@@ -638,8 +644,7 @@ kbd {
   .os-window { position: relative !important; top: auto !important; left: auto !important; width: 100% !important; box-shadow: 3px 4px 0 var(--window-shadow); }
   .window-projects .window-body { max-height: none; overflow: visible; }
   .window-titlebar { cursor: default; }
-  .dock { position: sticky; bottom: 0; overflow-x: auto; justify-content: flex-start; }
-  .dock-item { flex: 0 0 auto; min-width: 4.8rem; }
+  .dock { position: sticky; bottom: 0; }
 }
 
 @media (max-width: 520px) {

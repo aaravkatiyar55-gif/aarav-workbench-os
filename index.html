@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=local-first-v2" />
+    <link rel="stylesheet" href="style.css?v=local-first-v4" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -187,9 +187,9 @@
           </span>
         </header>
         <div class="window-body writing-body">
-          <p class="window-kicker">Private local tool</p>
+          <p class="window-kicker">Browser-local note</p>
           <h2>Leave yourself a useful note.</h2>
-          <p class="small-note writing-intro">Saved only in this browser while you type. It is not shared with Aarav or anyone else.</p>
+          <p class="small-note writing-intro">Saved in this browser while you type and not shared by Workbench. It is not encrypted, so do not use it for sensitive information on a shared device.</p>
           <label class="writing-field" for="notebook-title-input">
             <span>Note title</span>
             <input id="notebook-title-input" type="text" maxlength="120" placeholder="e.g. Things to improve next" autocomplete="off" />
@@ -264,9 +264,9 @@
           </span>
         </header>
         <div class="window-body writing-body">
-          <p class="window-kicker">Private local draft</p>
+          <p class="window-kicker">Browser-local draft</p>
           <h2>Write a little of your story.</h2>
-          <p class="small-note writing-intro">This stays in this browser. It does not create a profile, match people, or publish anything.</p>
+          <p class="small-note writing-intro">Typed draft text stays in this browser and is not encrypted, so avoid sensitive information on a shared device. If you choose voice input, your browser may send spoken audio to its own speech service; avoid dictating sensitive information. Workbench does not record audio, create a profile, match people, or publish anything.</p>
           <label class="writing-field" for="journal-input">
             <span>Your draft</span>
             <textarea id="journal-input" rows="8" maxlength="12000" placeholder="A small memory, an idea, or something you want to remember…"></textarea>
@@ -511,6 +511,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=local-first-v2"></script>
+    <script type="module" src="script.js?v=local-first-v4"></script>
   </body>
 </html>

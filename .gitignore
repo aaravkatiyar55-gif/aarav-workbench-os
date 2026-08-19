@@ -12,3 +12,6 @@ Thumbs.db
 # Temporary local test output
 test-output/
 playwright-report/
+
+# Local-only Stardance preparation. These drafts are never a substitute for a real post.
+.stardance/
