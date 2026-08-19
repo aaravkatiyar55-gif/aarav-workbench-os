@@ -9,6 +9,7 @@ const JOURNAL_KEY = `${STORAGE_PREFIX}.journal.v1`;
 const PERFORMANCE_KEY = `${STORAGE_PREFIX}.performance.v1`;
 const SIGNAL_SPRINT_KEY = `${STORAGE_PREFIX}.signal-sprint.v1`;
 const DESK_GRID_KEY = `${STORAGE_PREFIX}.desk-grid.v1`;
+const STREAK_KEY = `${STORAGE_PREFIX}.streak.v1`;
 const LAYOUT_VERSION = 1;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
@@ -56,6 +57,13 @@ const deskGrid = document.querySelector("#desk-grid");
 const deskGridStatus = document.querySelector("#desk-grid-status");
 const deskGridBest = document.querySelector("#desk-grid-best");
 const deskGridNewButton = document.querySelector("#desk-grid-new");
+const consoleForm = document.querySelector("#console-form");
+const consoleInput = document.querySelector("#console-input");
+const consoleOutput = document.querySelector("#console-output");
+const consoleRunButton = document.querySelector("#console-run");
+const consoleClearButton = document.querySelector("#console-clear");
+const streakCount = document.querySelector("#streak-count");
+const streakStatus = document.querySelector("#streak-status");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -323,6 +331,9 @@ function closeWindow(windowElement) {
 }
 
 function restoreWindow(windowElement) {
+  if (["notebook", "journal", "themes", "games", "console", "launchpad"].includes(windowElement.dataset.windowId)) {
+    recordLocalCheckIn();
+  }
   focusWindow(windowElement, { shouldFocus: true, announceFocus: true });
   persistLayout();
 }
@@ -723,6 +734,166 @@ function initializeGames() {
   updateSignalBest();
   updateDeskGridBest();
   createDeskGrid();
+}
+
+function localDateKey(date = new Date()) {
+  const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return localTime.toISOString().slice(0, 10);
+}
+
+function dateDistanceInDays(previousDateKey, currentDateKey) {
+  const previous = Date.parse(`${previousDateKey}T00:00:00Z`);
+  const current = Date.parse(`${currentDateKey}T00:00:00Z`);
+  if (Number.isNaN(previous) || Number.isNaN(current)) {
+    return null;
+  }
+  return Math.round((current - previous) / 86_400_000);
+}
+
+function isValidLocalDateKey(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) {
+    return false;
+  }
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+function readSavedStreak() {
+  const rawStreak = safeGet(STREAK_KEY);
+  if (!rawStreak) {
+    return { count: 0, lastCheckIn: null };
+  }
+
+  try {
+    const parsed = JSON.parse(rawStreak);
+    const count = Number.isInteger(parsed?.count) && parsed.count > 0 ? parsed.count : 0;
+    const lastCheckIn = isValidLocalDateKey(parsed?.lastCheckIn) ? parsed.lastCheckIn : null;
+    return count && lastCheckIn ? { count, lastCheckIn } : { count: 0, lastCheckIn: null };
+  } catch {
+    return { count: 0, lastCheckIn: null };
+  }
+}
+
+function updateStreakUI(streak = readSavedStreak()) {
+  streakCount.textContent = `${streak.count} day${streak.count === 1 ? "" : "s"}`;
+  streakStatus.textContent = streak.count
+    ? `${streak.count}-day local check-in streak. It records local Workbench use only, not coding time.`
+    : "Open a local Workbench tool to begin a local check-in streak.";
+}
+
+function recordLocalCheckIn() {
+  const today = localDateKey();
+  const previous = readSavedStreak();
+  const daysSincePrevious = previous.lastCheckIn ? dateDistanceInDays(previous.lastCheckIn, today) : null;
+  let nextCount = previous.count;
+
+  if (previous.lastCheckIn === today) {
+    updateStreakUI(previous);
+    return;
+  }
+
+  if (daysSincePrevious === 1) {
+    nextCount += 1;
+  } else {
+    nextCount = 1;
+  }
+
+  const nextStreak = { version: 1, count: nextCount, lastCheckIn: today };
+  if (safeSet(STREAK_KEY, JSON.stringify(nextStreak))) {
+    updateStreakUI(nextStreak);
+  }
+}
+
+function initializeLocalActivity() {
+  updateStreakUI();
+}
+
+function appendConsoleLine(text, className = "") {
+  const line = document.createElement("p");
+  line.textContent = text;
+  if (className) {
+    line.className = className;
+  }
+  consoleOutput.append(line);
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+function clearConsoleOutput() {
+  consoleOutput.replaceChildren();
+  appendConsoleLine("Type help to see the small set of browser-only commands.");
+  announce("Workbench Console output cleared.");
+}
+
+function runBrowserOnlyCommand(rawCommand) {
+  const command = rawCommand.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+  if (!command) {
+    appendConsoleLine("Enter a browser-only command, or type help.", "console-error");
+    return;
+  }
+
+  appendConsoleLine(`> ${rawCommand.trim()}`, "console-input-line");
+
+  const openWindow = (windowId) => {
+    const windowElement = windowsById.get(windowId);
+    if (!windowElement) {
+      appendConsoleLine("That Workbench window is not available.", "console-error");
+      return;
+    }
+    restoreWindow(windowElement);
+    appendConsoleLine(`${friendlyTitle(windowElement)} opened in this browser.`);
+  };
+
+  if (command === "help") {
+    appendConsoleLine("Commands: help, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, theme paper|night|moss|ember, status, clear.");
+    return;
+  }
+
+  if (command === "clear") {
+    clearConsoleOutput();
+    return;
+  }
+
+  if (command.startsWith("open ")) {
+    const names = {
+      notebook: "notebook",
+      games: "games",
+      journal: "journal",
+      themes: "themes",
+      projects: "projects",
+      snapshot: "snapshot",
+      launchpad: "launchpad",
+      console: "console",
+    };
+    if (Object.hasOwn(names, command.slice(5))) {
+      openWindow(names[command.slice(5)]);
+      return;
+    }
+  }
+
+  if (command.startsWith("theme ")) {
+    const requestedTheme = command.slice(6);
+    if (Object.hasOwn(THEMES, requestedTheme)) {
+      setTheme(requestedTheme, { announceTheme: true });
+      appendConsoleLine(`${THEMES[requestedTheme]} theme saved in this browser.`);
+      return;
+    }
+  }
+
+  if (command === "status") {
+    const visibleWindows = windowElements.filter((windowElement) => !windowElement.hidden && windowElement.dataset.minimized !== "true").length;
+    const theme = THEMES[normalizeTheme(document.body.dataset.theme)];
+    const motion = document.body.dataset.performanceMode === "true" ? "quieter" : "normal";
+    appendConsoleLine(`${visibleWindows} windows visible. Theme: ${theme}. Motion: ${motion}. Saved browser data stays scoped to Aarav Workbench OS.`);
+    return;
+  }
+
+  appendConsoleLine("That is not a Workbench command. Type help for the supported browser-only commands.", "console-error");
+}
+
+function executeConsoleInput() {
+  runBrowserOnlyCommand(consoleInput.value.slice(0, consoleInput.maxLength));
+  consoleInput.value = "";
+  consoleInput.focus();
 }
 
 function updateClock() {
@@ -1175,6 +1346,18 @@ function bindGlobalControls() {
   signalStartButton.addEventListener("click", startSignalSprint);
   signalPressButton.addEventListener("click", pressSignalSprint);
   deskGridNewButton.addEventListener("click", createDeskGrid);
+  consoleForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    executeConsoleInput();
+  });
+  consoleRunButton.addEventListener("click", executeConsoleInput);
+  consoleInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      executeConsoleInput();
+    }
+  });
+  consoleClearButton.addEventListener("click", clearConsoleOutput);
   document.querySelector("#open-command-dock").addEventListener("click", (event) => openCommandDock(event.currentTarget));
   document.querySelector("#close-command-dock").addEventListener("click", closeCommandDock);
   document.querySelector("#save-workspace").addEventListener("click", () => persistLayout({ announceSave: true }));
@@ -1283,6 +1466,7 @@ function initialize() {
   renderProjects();
   initializeWritingTools();
   initializeGames();
+  initializeLocalActivity();
   applyLayout();
   bindWindowControls();
   bindGlobalControls();

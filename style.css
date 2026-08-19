@@ -270,6 +270,8 @@ kbd {
 .window-journal { width: min(26rem, calc(100% - 1.5rem)); }
 .window-games { width: min(29rem, calc(100% - 1.5rem)); }
 .window-snapshot { width: min(23rem, calc(100% - 1.5rem)); }
+.window-console { width: min(31rem, calc(100% - 1.5rem)); }
+.window-launchpad { width: min(24rem, calc(100% - 1.5rem)); }
 .window-projects .window-body {
   max-height: min(29rem, calc(100vh - var(--topbar-height) - var(--dock-height) - 2.8rem));
   overflow-y: auto;
@@ -486,6 +488,72 @@ kbd {
 .desk-grid-card[data-revealed="true"] { border-color: var(--teal); background: color-mix(in srgb, var(--teal) 16%, var(--paper)); }
 .desk-grid-card[data-matched="true"] { border-color: var(--signal); color: var(--signal-deep); opacity: 1; }
 
+.console-body { display: grid; gap: 0.72rem; }
+.console-body h2 { margin-bottom: 0; }
+.console-boundary {
+  margin: 0;
+  padding: 0.68rem;
+  border-left: 4px solid var(--signal);
+  background: color-mix(in srgb, var(--signal) 9%, var(--paper));
+  color: var(--ink);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.console-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; }
+.console-field { display: grid; gap: 0.32rem; color: var(--muted); font-size: 0.76rem; font-weight: 800; }
+.console-field input {
+  width: 100%;
+  padding: 0.64rem 0.68rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.console-output {
+  display: grid;
+  gap: 0.38rem;
+  min-height: 7rem;
+  max-height: 12rem;
+  overflow: auto;
+  padding: 0.7rem;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.console-output p { margin: 0; }
+.console-output .console-input-line { color: var(--focus); }
+.console-output .console-error { color: #ffbd9f; }
+.console-output code { color: inherit; font: inherit; }
+.console-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.console-actions .small-note { margin: 0; }
+
+.launchpad-body { display: grid; gap: 0.72rem; }
+.launchpad-body h2 { margin-bottom: 0; }
+.launchpad-body > .small-note { margin: 0; }
+.launchpad-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.42rem; }
+.launchpad-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.38rem;
+  padding: 0.58rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--teal-dark);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.launchpad-links a:hover { border-color: var(--teal); background: color-mix(in srgb, var(--teal) 10%, var(--paper)); }
+.streak-card { display: grid; gap: 0.45rem; padding: 0.76rem; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 45%, var(--window)); }
+.streak-card h3 { margin: 0.2rem 0 0; font-size: 1rem; }
+.streak-count { justify-self: start; padding: 0.25rem 0.45rem; border: 2px solid var(--signal); color: var(--signal-deep); font-size: 0.8rem; font-weight: 900; }
+.streak-card .small-note { margin: 0; }
+
 .dock {
   position: relative;
   z-index: 900;
@@ -583,6 +651,9 @@ kbd {
   .theme-grid { grid-template-columns: 1fr; }
   .game-heading { align-items: flex-start; flex-direction: column; }
   .desk-grid { gap: 0.36rem; }
+  .console-form { grid-template-columns: 1fr; }
+  .console-form .primary-button { justify-self: start; }
+  .launchpad-links { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

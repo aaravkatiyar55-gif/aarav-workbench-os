@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=local-first-v2" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -367,6 +367,84 @@
           <p class="small-note">Saved locally on this device. Nothing is sent anywhere.</p>
         </div>
       </section>
+
+      <section
+        id="console-window"
+        class="os-window window-console"
+        data-window-id="console"
+        data-default-x="496"
+        data-default-y="704"
+        data-start-minimized="true"
+        aria-labelledby="console-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Workbench Console window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg>
+          <span id="console-title" class="window-title">Workbench Console</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Workbench Console">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Workbench Console">×</button>
+          </span>
+        </header>
+        <div class="window-body console-body">
+          <p class="window-kicker">Safe local control</p>
+          <h2>Browser-only commands.</h2>
+          <p class="console-boundary">This is not a system terminal. It cannot run PowerShell, open files, or control apps on your computer.</p>
+          <form id="console-form" class="console-form">
+            <label class="console-field" for="console-input">
+              <span>Try a Workbench command</span>
+              <input id="console-input" type="text" maxlength="120" autocomplete="off" spellcheck="false" placeholder="help, open notebook, theme moss" />
+            </label>
+            <button id="console-run" class="primary-button" type="button">Run</button>
+          </form>
+          <div id="console-output" class="console-output" role="log" aria-live="polite" aria-label="Workbench Console output">
+            <p>Type <code>help</code> to see the small set of browser-only commands.</p>
+          </div>
+          <div class="console-actions">
+            <button id="console-clear" class="quiet-button" type="button">Clear output</button>
+            <p class="small-note">Output is temporary and is not saved.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="launchpad-window"
+        class="os-window window-launchpad"
+        data-window-id="launchpad"
+        data-default-x="978"
+        data-default-y="690"
+        data-start-minimized="true"
+        aria-labelledby="launchpad-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Launchpad window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg>
+          <span id="launchpad-title" class="window-title">Launchpad</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Launchpad">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Launchpad">×</button>
+          </span>
+        </header>
+        <div class="window-body launchpad-body">
+          <p class="window-kicker">Direct links and local activity</p>
+          <h2>Leave the desk when you want.</h2>
+          <p class="small-note">These open their official websites in a new tab. Workbench does not sign in, embed, or control them.</p>
+          <div class="launchpad-links" aria-label="Open official websites">
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span></a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span></a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
+          </div>
+          <section class="streak-card" aria-labelledby="streak-title">
+            <div>
+              <p class="game-label">Local check-in</p>
+              <h3 id="streak-title">A tiny desk streak.</h3>
+            </div>
+            <output id="streak-count" class="streak-count">0 days</output>
+            <p id="streak-status" class="small-note" role="status">Open a local Workbench tool to begin a local check-in streak.</p>
+            <p class="small-note">Badges are local only, non-transferable, and have no monetary value.</p>
+          </section>
+        </div>
+      </section>
     </main>
 
     <nav class="dock" aria-label="Open applications">
@@ -393,6 +471,12 @@
       </button>
       <button type="button" class="dock-item" data-open-window="games" aria-label="Open Game Room">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg><span>Games</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="console" aria-label="Open Workbench Console">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg><span>Console</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="launchpad" aria-label="Open Launchpad">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg><span>Launchpad</span>
       </button>
       <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>
@@ -427,6 +511,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="script.js?v=local-first-v2"></script>
   </body>
 </html>
