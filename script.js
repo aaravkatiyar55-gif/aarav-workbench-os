@@ -2,11 +2,20 @@ import { projects } from "./projects.js";
 
 const STORAGE_PREFIX = "aarav-workbench-os";
 const LAYOUT_KEY = `${STORAGE_PREFIX}.layout.v1`;
-const THEME_KEY = `${STORAGE_PREFIX}.theme.v1`;
+const LEGACY_THEME_KEY = `${STORAGE_PREFIX}.theme.v1`;
+const THEME_KEY = `${STORAGE_PREFIX}.theme.v2`;
 const NOTEBOOK_KEY = `${STORAGE_PREFIX}.notebook.v1`;
 const JOURNAL_KEY = `${STORAGE_PREFIX}.journal.v1`;
+const PERFORMANCE_KEY = `${STORAGE_PREFIX}.performance.v1`;
 const LAYOUT_VERSION = 1;
 const MOVE_STEP = 24;
+const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
+const THEMES = {
+  paper: "Paper",
+  night: "Night",
+  moss: "Moss",
+  ember: "Ember",
+};
 
 const desktop = document.querySelector("#desktop");
 const statusMessage = document.querySelector("#status-message");
@@ -32,6 +41,11 @@ const clearDataTitle = document.querySelector("#clear-data-title");
 const clearDataDescription = document.querySelector("#clear-data-description");
 const confirmClearDataButton = document.querySelector("#confirm-clear-data");
 const cancelClearDataButton = document.querySelector("#cancel-clear-data");
+const wallpaperInput = document.querySelector("#wallpaper-input");
+const wallpaperStatus = document.querySelector("#wallpaper-status");
+const resetWallpaperButton = document.querySelector("#reset-wallpaper");
+const performanceModeToggle = document.querySelector("#performance-mode-toggle");
+const performanceStatus = document.querySelector("#performance-status");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -44,6 +58,7 @@ let clearDataTarget = null;
 let clearDataTrigger = null;
 let speechRecognition = null;
 let isDictating = false;
+let customWallpaperUrl = null;
 
 function isMobileLayout() {
   return window.matchMedia("(max-width: 767px)").matches;
@@ -313,21 +328,133 @@ function resetLayout() {
   announce("Default workspace layout restored. Your theme was kept.");
 }
 
-function setTheme(theme, { announceTheme = false } = {}) {
-  const nextTheme = theme === "night" ? "night" : "paper";
+function normalizeTheme(theme) {
+  return Object.hasOwn(THEMES, theme) ? theme : "paper";
+}
+
+function updateThemeControls(theme) {
+  const label = THEMES[theme];
+  themeToggle.textContent = `Theme: ${label}`;
+  themeToggle.setAttribute("aria-label", `Cycle workspace theme. Current theme: ${label}`);
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.themeChoice === theme));
+  });
+}
+
+function setTheme(theme, { announceTheme = false, persist = true } = {}) {
+  const nextTheme = normalizeTheme(theme);
   document.body.dataset.theme = nextTheme;
-  themeToggle.setAttribute("aria-pressed", String(nextTheme === "night"));
-  themeToggle.textContent = nextTheme === "night" ? "Use paper theme" : "Use low-light theme";
-  safeSet(THEME_KEY, nextTheme);
+  updateThemeControls(nextTheme);
+
+  if (persist) {
+    safeSet(THEME_KEY, nextTheme);
+  }
 
   if (announceTheme) {
-    announce(nextTheme === "night" ? "Low-light theme enabled." : "Paper theme enabled.");
+    announce(`${THEMES[nextTheme]} theme enabled.`);
   }
 }
 
-function initializeTheme() {
+function readSavedTheme() {
   const savedTheme = safeGet(THEME_KEY);
-  setTheme(savedTheme === "night" ? "night" : "paper");
+  if (Object.hasOwn(THEMES, savedTheme)) {
+    return savedTheme;
+  }
+
+  const legacyTheme = safeGet(LEGACY_THEME_KEY);
+  if (legacyTheme === "paper" || legacyTheme === "night") {
+    safeSet(THEME_KEY, legacyTheme);
+    return legacyTheme;
+  }
+
+  return "paper";
+}
+
+function initializeTheme() {
+  setTheme(readSavedTheme(), { persist: false });
+}
+
+function cycleTheme() {
+  const themeNames = Object.keys(THEMES);
+  const currentIndex = themeNames.indexOf(document.body.dataset.theme);
+  const nextTheme = themeNames[(currentIndex + 1) % themeNames.length];
+  setTheme(nextTheme, { announceTheme: true });
+}
+
+function setPerformanceMode(enabled, { announceMode = false } = {}) {
+  const nextValue = Boolean(enabled);
+  document.body.dataset.performanceMode = String(nextValue);
+  performanceModeToggle.setAttribute("aria-pressed", String(nextValue));
+  performanceModeToggle.textContent = nextValue ? "Use normal motion" : "Use quieter motion";
+  performanceStatus.textContent = nextValue
+    ? "Quieter motion is active for this WebOS only; it does not optimize your computer."
+    : "Quieter motion is off. This setting affects this WebOS only; it does not optimize your computer.";
+  safeSet(PERFORMANCE_KEY, JSON.stringify({ version: 1, reducedMotion: nextValue }));
+
+  if (announceMode) {
+    announce(nextValue ? "Quieter motion enabled for this WebOS." : "Normal Workbench motion restored.");
+  }
+}
+
+function initializePerformanceMode() {
+  const rawPerformance = safeGet(PERFORMANCE_KEY);
+  if (!rawPerformance) {
+    setPerformanceMode(false);
+    return;
+  }
+
+  try {
+    const savedPerformance = JSON.parse(rawPerformance);
+    setPerformanceMode(savedPerformance?.version === 1 && savedPerformance.reducedMotion === true);
+  } catch {
+    setPerformanceMode(false);
+  }
+}
+
+function removeCustomWallpaper({ announceRemoval = false } = {}) {
+  if (customWallpaperUrl) {
+    URL.revokeObjectURL(customWallpaperUrl);
+    customWallpaperUrl = null;
+  }
+
+  desktop.dataset.wallpaper = "default";
+  desktop.style.removeProperty("--custom-wallpaper");
+  wallpaperInput.value = "";
+  resetWallpaperButton.disabled = true;
+  wallpaperStatus.textContent = "Built-in themes are saved. A chosen image lasts only for this open tab and is never uploaded.";
+
+  if (announceRemoval) {
+    announce("Temporary wallpaper removed. Your saved theme was kept.");
+  }
+}
+
+function setTemporaryWallpaper(file) {
+  const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+  if (!file) {
+    return;
+  }
+
+  if (!allowedTypes.has(file.type)) {
+    wallpaperInput.value = "";
+    wallpaperStatus.textContent = "Choose a PNG, JPEG, or WebP image. No file was used.";
+    return;
+  }
+
+  if (file.size > MAX_WALLPAPER_BYTES) {
+    wallpaperInput.value = "";
+    wallpaperStatus.textContent = "Choose an image smaller than 4 MB. No file was used.";
+    return;
+  }
+
+  if (customWallpaperUrl) {
+    URL.revokeObjectURL(customWallpaperUrl);
+  }
+  customWallpaperUrl = URL.createObjectURL(file);
+  desktop.style.setProperty("--custom-wallpaper", `url("${customWallpaperUrl}")`);
+  desktop.dataset.wallpaper = "custom";
+  resetWallpaperButton.disabled = false;
+  wallpaperStatus.textContent = "Temporary wallpaper active for this tab only. It was not uploaded or saved.";
+  announce("Temporary wallpaper applied for this tab only.");
 }
 
 function updateClock() {
@@ -609,11 +736,17 @@ function commandDefinitions() {
       run: resetLayout,
     },
     {
-      id: "toggle-theme",
-      label: "Toggle paper / low-light theme",
-      detail: "Change the local color preference",
-      run: () => setTheme(document.body.dataset.theme === "night" ? "paper" : "night", { announceTheme: true }),
+      id: "cycle-theme",
+      label: "Cycle workspace theme",
+      detail: "Switch between Paper, Night, Moss, and Ember",
+      run: cycleTheme,
     },
+    ...Object.entries(THEMES).map(([theme, label]) => ({
+      id: `use-${theme}-theme`,
+      label: `Use ${label} theme`,
+      detail: "Save this color preference in this browser",
+      run: () => setTheme(theme, { announceTheme: true }),
+    })),
   ];
 }
 
@@ -762,8 +895,14 @@ function bindGlobalControls() {
     });
   });
 
-  themeToggle.addEventListener("click", () => {
-    setTheme(document.body.dataset.theme === "night" ? "paper" : "night", { announceTheme: true });
+  themeToggle.addEventListener("click", cycleTheme);
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    button.addEventListener("click", () => setTheme(button.dataset.themeChoice, { announceTheme: true }));
+  });
+  wallpaperInput.addEventListener("change", (event) => setTemporaryWallpaper(event.currentTarget.files?.[0]));
+  resetWallpaperButton.addEventListener("click", () => removeCustomWallpaper({ announceRemoval: true }));
+  performanceModeToggle.addEventListener("click", () => {
+    setPerformanceMode(document.body.dataset.performanceMode !== "true", { announceMode: true });
   });
   document.querySelector("#open-command-dock").addEventListener("click", (event) => openCommandDock(event.currentTarget));
   document.querySelector("#close-command-dock").addEventListener("click", closeCommandDock);
@@ -863,10 +1002,13 @@ function bindGlobalControls() {
     });
     updateLayoutSummary();
   });
+
+  window.addEventListener("beforeunload", () => removeCustomWallpaper());
 }
 
 function initialize() {
   initializeTheme();
+  initializePerformanceMode();
   renderProjects();
   initializeWritingTools();
   applyLayout();

@@ -24,8 +24,8 @@
 
       <div class="topbar-actions">
         <time id="clock" class="clock" aria-label="Local time">Loading time</time>
-        <button id="theme-toggle" class="quiet-button" type="button" aria-pressed="false">
-          Use low-light theme
+        <button id="theme-toggle" class="quiet-button" type="button" aria-label="Cycle workspace theme. Current theme: Paper">
+          Theme: Paper
         </button>
         <button id="open-command-dock" class="command-button" type="button">
           <svg aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg>
@@ -128,7 +128,7 @@
             </li>
             <li>
               <span class="note-number">02</span>
-              <p><strong>Keep local things local.</strong> This desktop stores only its own layout and theme in the browser.</p>
+              <p><strong>Keep local things local.</strong> This desktop keeps its own layout, theme, and writing drafts in the browser.</p>
             </li>
             <li>
               <span class="note-number">03</span>
@@ -202,6 +202,46 @@
             <button id="clear-notebook" class="quiet-button" type="button">Clear notebook</button>
             <p id="notebook-status" class="save-status" aria-live="polite">Nothing has been written yet.</p>
           </div>
+        </div>
+      </section>
+
+      <section
+        id="themes-window"
+        class="os-window window-themes"
+        data-window-id="themes"
+        data-default-x="74"
+        data-default-y="352"
+        data-start-minimized="true"
+        aria-labelledby="themes-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Theme Lab window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg>
+          <span id="themes-title" class="window-title">Theme Lab</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Theme Lab">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Theme Lab">×</button>
+          </span>
+        </header>
+        <div class="window-body theme-body">
+          <p class="window-kicker">Saved on this device</p>
+          <h2>Change the desk, not your data.</h2>
+          <div class="theme-grid" role="group" aria-label="Choose a workbench theme">
+            <button class="theme-choice" type="button" data-theme-choice="paper"><span class="theme-swatch swatch-paper" aria-hidden="true"></span><strong>Paper</strong><small>Warm and clear</small></button>
+            <button class="theme-choice" type="button" data-theme-choice="night"><span class="theme-swatch swatch-night" aria-hidden="true"></span><strong>Night</strong><small>Low-light desk</small></button>
+            <button class="theme-choice" type="button" data-theme-choice="moss"><span class="theme-swatch swatch-moss" aria-hidden="true"></span><strong>Moss</strong><small>Quiet green</small></button>
+            <button class="theme-choice" type="button" data-theme-choice="ember"><span class="theme-swatch swatch-ember" aria-hidden="true"></span><strong>Ember</strong><small>Warm signal</small></button>
+          </div>
+          <label class="wallpaper-field" for="wallpaper-input">
+            <span>Temporary custom wallpaper</span>
+            <input id="wallpaper-input" type="file" accept="image/png,image/jpeg,image/webp" />
+          </label>
+          <p id="wallpaper-status" class="save-status" role="status">Built-in themes are saved. A chosen image lasts only for this open tab and is never uploaded.</p>
+          <div class="theme-actions">
+            <button id="reset-wallpaper" class="quiet-button" type="button" disabled>Remove temporary wallpaper</button>
+            <button id="performance-mode-toggle" class="quiet-button" type="button" aria-pressed="false">Use quieter motion</button>
+          </div>
+          <p id="performance-status" class="small-note">Quieter motion affects this WebOS only; it does not optimize your computer.</p>
         </div>
       </section>
 
@@ -286,6 +326,9 @@
       </button>
       <button type="button" class="dock-item" data-open-window="toolbox" aria-label="Open Toolbox">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Tools</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="themes" aria-label="Open Theme Lab">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Themes</span>
       </button>
       <button type="button" class="dock-item" data-open-window="notebook" aria-label="Open Notebook">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Notebook</span>
