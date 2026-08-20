@@ -97,4 +97,4 @@ OpenAI Codex was used for planning, implementation assistance, debugging, testin
 
 ## Current status
 
-The local-first expansion is deployed and was freshly checked at the public URL. A clean expanded screenshot was captured but not uploaded, and factual devlog drafts remain local-only. Stardance project-info updates and any final Ship action remain separate actions and require genuine evidence plus explicit approval.
+The local-first expansion and the v11 visible-window navigation update are deployed and were freshly checked at the public URL. Two factual Stardance devlogs with real screenshots have been posted. A third devlog and final Ship action remain gated by Stardance's real logged-time requirement; this project does not claim those steps are complete until its UI enables them.
