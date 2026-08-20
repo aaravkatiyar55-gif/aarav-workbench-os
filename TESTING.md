@@ -28,6 +28,7 @@ This file records observed results only. A planned check is not a pass.
 | Quiet landing / maximize / game tabs / voice language | Source + syntax checks | Source-checked | The v5 update starts with all app windows closed, adds maximize/restore state to layout v2, provides an accessible Signal Sprint / Desk Grid tab switcher, and lets a visitor choose Hindi or English speech recognition. Fresh browser interaction testing is pending before a runtime or deployed claim. |
 | Focus List | Source + syntax checks | Source-checked | The v6 update adds a small, namespaced local next-step list with blank/duplicate/12-item guards, completion and remove controls, and an `open focus` console alias. Fresh browser interaction testing is pending before a runtime or deployed claim. |
 | Recent Desk trail | Source + syntax checks | Source-checked | The v7 update keeps up to four recently opened Workbench tools in a namespaced local list and shows them only on the otherwise-clear landing screen. Fresh browser interaction testing is pending before a runtime or deployed claim. |
+| Desk Modes | Source + syntax checks | Source-checked | The v8 update provides Explore, Focus, and Break recipes. A selected recipe restores only its useful windows, minimizes other open apps, keeps all data intact, and saves the resulting layout. Fresh browser interaction testing is pending before a runtime or deployed claim. |
 
 ## Test boundaries
 

@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v7" />
+    <link rel="stylesheet" href="style.css?v=workspace-v8" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -47,6 +47,18 @@
           <button type="button" class="quiet-button" data-open-window="projects">Browse projects</button>
           <button type="button" class="quiet-button" data-open-window="games">Take a desk break</button>
         </div>
+        <section class="desk-modes" aria-labelledby="desk-modes-title">
+          <div>
+            <p class="window-kicker">Window recipes</p>
+            <h2 id="desk-modes-title">Set up a desk, not a mess.</h2>
+          </div>
+          <p class="small-note">A recipe opens its useful windows and minimizes the rest. Nothing is deleted; the dock can restore any app.</p>
+          <div class="desk-mode-actions">
+            <button class="desk-mode" type="button" data-desk-mode="explore"><strong>Explore</strong><span>Projects + build notes</span></button>
+            <button class="desk-mode" type="button" data-desk-mode="focus"><strong>Focus</strong><span>Focus List + Notebook</span></button>
+            <button class="desk-mode" type="button" data-desk-mode="break"><strong>Break</strong><span>Game Room only</span></button>
+          </div>
+        </section>
         <section class="landing-recents" aria-labelledby="recent-apps-title">
           <div class="window-heading-row">
             <div>
@@ -583,6 +595,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=workspace-v7"></script>
+    <script type="module" src="script.js?v=workspace-v8"></script>
   </body>
 </html>

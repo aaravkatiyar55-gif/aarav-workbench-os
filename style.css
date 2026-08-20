@@ -272,6 +272,14 @@ kbd {
 .landing-panel h1 { margin: 0; max-width: 12ch; font-size: clamp(2.25rem, 6vw, 4.9rem); letter-spacing: -0.06em; line-height: 0.9; }
 .landing-panel > p:not(.window-kicker):not(.small-note) { max-width: 56ch; margin: 0; color: var(--muted); line-height: 1.55; }
 .landing-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.desk-modes { display: grid; gap: 0.55rem; max-width: 42rem; padding: 0.85rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.desk-modes h2 { margin: 0; font-size: 1rem; }
+.desk-modes .small-note { margin: 0; }
+.desk-mode-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.desk-mode { display: grid; gap: 0.2rem; min-height: 4.4rem; padding: 0.6rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--window); color: var(--ink); text-align: left; font: inherit; }
+.desk-mode strong { color: var(--teal-deep); font-size: 0.9rem; }
+.desk-mode span { color: var(--muted); font-size: 0.75rem; line-height: 1.35; }
+.desk-mode:hover { border-color: var(--teal); background: var(--paper-deep); }
 .landing-recents { display: grid; gap: 0.55rem; max-width: 42rem; padding-top: 0.2rem; border-top: 1px solid var(--line); }
 .landing-recents h2 { margin: 0; font-size: 1rem; }
 .recent-apps { display: flex; flex-wrap: wrap; gap: 0.45rem; }
@@ -719,6 +727,7 @@ kbd {
   .launchpad-links { grid-template-columns: 1fr; }
   .focus-list-form { grid-template-columns: 1fr; }
   .focus-list-form .primary-button { justify-self: start; }
+  .desk-mode-actions { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

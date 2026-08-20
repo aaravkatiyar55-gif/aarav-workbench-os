@@ -78,6 +78,7 @@ const focusListStatus = document.querySelector("#focus-list-status");
 const recentAppsElement = document.querySelector("#recent-apps");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
+const deskModeButtons = [...document.querySelectorAll("[data-desk-mode]")];
 
 let topZIndex = 10;
 let activeWindowId = "welcome";
@@ -112,6 +113,12 @@ const DESK_GRID_PAIRS = [
   { symbol: "☾", name: "moon" },
   { symbol: "✚", name: "cross" },
 ];
+
+const DESK_MODES = {
+  explore: ["projects", "notes"],
+  focus: ["focus-list", "notebook"],
+  break: ["games"],
+};
 
 function isMobileLayout() {
   return window.matchMedia("(max-width: 767px)").matches;
@@ -409,6 +416,40 @@ function restoreWindow(windowElement) {
   focusWindow(windowElement, { shouldFocus: true, announceFocus: true });
   recordRecentApp(windowElement.dataset.windowId);
   persistLayout();
+}
+
+function openDeskMode(mode) {
+  const windowIds = DESK_MODES[mode];
+  if (!windowIds) {
+    return;
+  }
+
+  windowElements.forEach((windowElement) => {
+    const isPartOfMode = windowIds.includes(windowElement.dataset.windowId);
+    if (isPartOfMode) {
+      windowElement.hidden = false;
+      windowElement.dataset.minimized = "false";
+      windowElement.dataset.maximized = "false";
+      bringToFront(windowElement);
+      recordRecentApp(windowElement.dataset.windowId);
+    } else if (!windowElement.hidden) {
+      if (windowElement.dataset.windowId === "journal") {
+        stopDictation();
+      }
+      if (windowElement.dataset.windowId === "games") {
+        stopGames();
+      }
+      windowElement.dataset.minimized = "true";
+    }
+    updateDockItem(windowElement);
+    updateMaximizeControl(windowElement);
+  });
+
+  updateLayoutSummary();
+  persistLayout();
+  const firstWindow = windowsById.get(windowIds[0]);
+  firstWindow?.querySelector("[data-drag-handle]")?.focus({ preventScroll: true });
+  announce(`${mode[0].toUpperCase()}${mode.slice(1)} desk ready. Other open apps were minimized, not closed.`);
 }
 
 function updateMaximizeControl(windowElement) {
@@ -1682,6 +1723,9 @@ function bindGlobalControls() {
   signalPressButton.addEventListener("click", pressSignalSprint);
   deskGridNewButton.addEventListener("click", createDeskGrid);
   focusListForm.addEventListener("submit", addFocusListItem);
+  deskModeButtons.forEach((button) => {
+    button.addEventListener("click", () => openDeskMode(button.dataset.deskMode));
+  });
   gameTabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setActiveGamePanel(tab.dataset.gameTab, { focusTab: false }));
     tab.addEventListener("keydown", (event) => {
