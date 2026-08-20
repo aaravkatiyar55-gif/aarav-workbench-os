@@ -444,7 +444,7 @@ function cycleVisibleWindow(direction = 1) {
 
   if (availableWindows.length === 0) {
     announce("No open windows to switch between. Open one from the dock first.");
-    return;
+    return false;
   }
 
   const currentIndex = availableWindows.findIndex((windowElement) => windowElement.dataset.windowId === activeWindowId);
@@ -454,6 +454,28 @@ function cycleVisibleWindow(direction = 1) {
 
   focusWindow(nextWindow, { shouldFocus: true, announceFocus: true });
   persistLayout();
+  return true;
+}
+
+function clearDesk() {
+  windowElements.forEach((windowElement) => {
+    if (windowElement.dataset.windowId === "journal") {
+      stopDictation();
+    }
+    if (windowElement.dataset.windowId === "games") {
+      stopGames();
+    }
+    windowElement.hidden = true;
+    windowElement.dataset.minimized = "false";
+    windowElement.dataset.maximized = "false";
+    updateDockItem(windowElement);
+    updateMaximizeControl(windowElement);
+  });
+
+  activeWindowId = "welcome";
+  persistLayout();
+  document.querySelector("#desktop")?.focus({ preventScroll: true });
+  announce("Desk cleared. Your local writing, settings, scores, and saved data were kept.");
 }
 
 function openDeskMode(mode) {
@@ -1205,7 +1227,7 @@ function runBrowserOnlyCommand(rawCommand) {
   };
 
   if (command === "help") {
-    appendConsoleLine("Commands: help, open focus, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, next, previous, theme paper|night|moss|ember, status, clear.");
+    appendConsoleLine("Commands: help, open focus, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, next, previous, home, theme paper|night|moss|ember, status, clear.");
     return;
   }
 
@@ -1215,14 +1237,22 @@ function runBrowserOnlyCommand(rawCommand) {
   }
 
   if (command === "next" || command === "next window") {
-    cycleVisibleWindow(1);
-    appendConsoleLine("Moved to the next open Workbench window.");
+    if (cycleVisibleWindow(1)) {
+      appendConsoleLine("Moved to the next open Workbench window.");
+    }
     return;
   }
 
   if (command === "previous" || command === "previous window") {
-    cycleVisibleWindow(-1);
-    appendConsoleLine("Moved to the previous open Workbench window.");
+    if (cycleVisibleWindow(-1)) {
+      appendConsoleLine("Moved to the previous open Workbench window.");
+    }
+    return;
+  }
+
+  if (command === "home" || command === "clear desk") {
+    clearDesk();
+    appendConsoleLine("The visible desk was cleared. Your local browser data was kept.");
     return;
   }
 
@@ -1593,6 +1623,12 @@ function commandDefinitions() {
       label: "Focus previous open window",
       detail: "Cycle through visible apps with Alt + PageUp",
       run: () => cycleVisibleWindow(-1),
+    },
+    {
+      id: "clear-desk",
+      label: "Clear the visible desk",
+      detail: "Return to the quiet landing without deleting local data",
+      run: clearDesk,
     },
     {
       id: "cycle-theme",

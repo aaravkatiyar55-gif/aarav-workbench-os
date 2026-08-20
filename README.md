@@ -22,7 +22,8 @@ The public app has no sign-in, password, cloud sync, server-side storage, analyt
 - Optional browser speech recognition for the journal, with Hindi and English choices, only after a visitor starts it and their browser handles permission; Workbench does not retain audio
 - **Theme Lab** with Paper, Night, Moss, and Ember themes, a WebOS-only quieter-motion setting, and a session-only custom wallpaper preview
 - **Game Room** with a keyboard-accessible game switcher for Signal Sprint reaction play and Desk Grid memory matching; local best scores persist in the browser
-- **Workbench Console** with a small allowlist of browser-only commands such as `help`, `open notebook`, `open games`, `next`, `previous`, `theme moss`, `status`, and `clear`
+- **Workbench Console** with a small allowlist of browser-only commands such as `help`, `open notebook`, `open games`, `next`, `previous`, `home`, `theme moss`, `status`, and `clear`
+- A non-destructive **Clear Desk** action in Command Dock and Console (`home` / `clear desk`) that returns to the quiet landing while keeping browser-local writing, settings, scores, and lists
 - **Launchpad** links that open YouTube, Facebook, and Instagram in a new tab without embedding, signing in to, controlling, or changing advertising on those services
 - A browser-local check-in streak that is not coding time, a Stardance reward, transferable value, or a prize
 - Mobile stacked-window layout and reduced-motion support
