@@ -15,6 +15,7 @@ The public app has no sign-in, password, cloud sync, server-side storage, analyt
 - Live local clock, Command Dock (`Ctrl`/`Cmd` + `K`), and `Alt` + arrow movement for a focused title bar
 - Project Shelf with verified public source/demo links, plus Build Notes and Toolbox windows
 - **Notebook** and **Story Journal** for browser-local writing; each has its own clear control and confirmation
+- **Focus List** for a deliberately small browser-local list of next steps, with add, complete, and remove controls
 - Optional browser speech recognition for the journal, with Hindi and English choices, only after a visitor starts it and their browser handles permission; Workbench does not retain audio
 - **Theme Lab** with Paper, Night, Moss, and Ember themes, a WebOS-only quieter-motion setting, and a session-only custom wallpaper preview
 - **Game Room** with a keyboard-accessible game switcher for Signal Sprint reaction play and Desk Grid memory matching; local best scores persist in the browser
@@ -30,6 +31,7 @@ All saved Workbench state is namespaced under `aarav-workbench-os.*` in the visi
 - desktop window layout, state, z-order, and a local save timestamp;
 - theme and quieter-motion preference;
 - Notebook title/body and Story Journal text;
+- Focus List steps and completion state;
 - local check-in streak date/count; and
 - local best scores for the two games.
 

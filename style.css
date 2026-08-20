@@ -295,6 +295,7 @@ kbd {
 .window-snapshot { width: min(23rem, calc(100% - 1.5rem)); }
 .window-console { width: min(31rem, calc(100% - 1.5rem)); }
 .window-launchpad { width: min(24rem, calc(100% - 1.5rem)); }
+.window-focus-list { width: min(25rem, calc(100% - 1.5rem)); }
 .window-projects .window-body {
   max-height: min(29rem, calc(100vh - var(--topbar-height) - var(--dock-height) - 2.8rem));
   overflow-y: auto;
@@ -594,6 +595,19 @@ kbd {
 .streak-count { justify-self: start; padding: 0.25rem 0.45rem; border: 2px solid var(--signal); color: var(--signal-deep); font-size: 0.8rem; font-weight: 900; }
 .streak-card .small-note { margin: 0; }
 
+.focus-list-body { display: grid; gap: 0.72rem; }
+.focus-list-body h2,
+.focus-list-body > .small-note { margin: 0; }
+.focus-list-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 0.5rem; }
+.focus-list-form .primary-button { min-height: 2.7rem; }
+.focus-list-items { display: grid; gap: 0.42rem; padding: 0; margin: 0; list-style: none; }
+.focus-list-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; padding: 0.58rem; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 45%, var(--window)); }
+.focus-list-item input { width: 1.05rem; height: 1.05rem; accent-color: var(--teal); }
+.focus-list-item span { overflow-wrap: anywhere; line-height: 1.35; }
+.focus-list-item[data-done="true"] span { color: var(--muted); text-decoration: line-through; }
+.focus-list-item button { padding: 0.28rem 0.42rem; border: 1px solid var(--line); border-radius: var(--radius); background: transparent; color: var(--ink); font-size: 0.76rem; font-weight: 800; }
+.focus-list-item button:hover { border-color: var(--signal); color: var(--signal-deep); }
+
 .dock {
   position: relative;
   z-index: 900;
@@ -697,6 +711,8 @@ kbd {
   .console-form { grid-template-columns: 1fr; }
   .console-form .primary-button { justify-self: start; }
   .launchpad-links { grid-template-columns: 1fr; }
+  .focus-list-form { grid-template-columns: 1fr; }
+  .focus-list-form .primary-button { justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

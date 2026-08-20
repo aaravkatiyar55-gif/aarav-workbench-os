@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v5" />
+    <link rel="stylesheet" href="style.css?v=workspace-v6" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -470,6 +470,40 @@
           </section>
         </div>
       </section>
+
+      <section
+        id="focus-list-window"
+        class="os-window window-focus-list"
+        data-window-id="focus-list"
+        data-default-x="682"
+        data-default-y="300"
+        data-start-minimized="true"
+        aria-labelledby="focus-list-title"
+      >
+        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Focus List window">
+          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
+          <span id="focus-list-title" class="window-title">Focus List</span>
+          <span class="window-actions">
+            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Focus List">−</button>
+            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Focus List">×</button>
+          </span>
+        </header>
+        <div class="window-body focus-list-body">
+          <p class="window-kicker">A small local reset</p>
+          <h2>Pick one useful next step.</h2>
+          <p class="small-note">This list stays in this browser. Keep it light: a next task, not your whole life.</p>
+          <form id="focus-list-form" class="focus-list-form">
+            <label class="writing-field" for="focus-list-input">
+              <span>Add a next step</span>
+              <input id="focus-list-input" type="text" maxlength="140" autocomplete="off" placeholder="e.g. Review the project shelf copy" />
+            </label>
+            <button class="primary-button" type="submit">Add step</button>
+          </form>
+          <p id="focus-list-status" class="save-status" role="status">No next steps yet.</p>
+          <ul id="focus-list-items" class="focus-list-items" aria-label="Saved next steps"></ul>
+        </div>
+      </section>
     </main>
 
     <nav class="dock" aria-label="Open applications">
@@ -502,6 +536,9 @@
       </button>
       <button type="button" class="dock-item" data-open-window="launchpad" aria-label="Open Launchpad">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg><span>Launchpad</span>
+      </button>
+      <button type="button" class="dock-item" data-open-window="focus-list" aria-label="Open Focus List">
+        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Focus</span>
       </button>
       <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
         <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>
@@ -536,6 +573,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=workspace-v5"></script>
+    <script type="module" src="script.js?v=workspace-v6"></script>
   </body>
 </html>

@@ -10,6 +10,7 @@ const PERFORMANCE_KEY = `${STORAGE_PREFIX}.performance.v1`;
 const SIGNAL_SPRINT_KEY = `${STORAGE_PREFIX}.signal-sprint.v1`;
 const DESK_GRID_KEY = `${STORAGE_PREFIX}.desk-grid.v1`;
 const STREAK_KEY = `${STORAGE_PREFIX}.streak.v1`;
+const FOCUS_LIST_KEY = `${STORAGE_PREFIX}.focus-list.v1`;
 const LAYOUT_VERSION = 2;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
@@ -69,6 +70,10 @@ const consoleRunButton = document.querySelector("#console-run");
 const consoleClearButton = document.querySelector("#console-clear");
 const streakCount = document.querySelector("#streak-count");
 const streakStatus = document.querySelector("#streak-status");
+const focusListForm = document.querySelector("#focus-list-form");
+const focusListInput = document.querySelector("#focus-list-input");
+const focusListItems = document.querySelector("#focus-list-items");
+const focusListStatus = document.querySelector("#focus-list-status");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -94,6 +99,7 @@ let deskGridState = {
   mismatchTimer: null,
 };
 let currentStreak = { count: 0, lastCheckIn: null };
+let focusList = [];
 
 const DESK_GRID_PAIRS = [
   { symbol: "▲", name: "triangle" },
@@ -913,6 +919,117 @@ function initializeLocalActivity() {
   updateStreakUI(currentStreak);
 }
 
+function normalizeFocusItem(candidate) {
+  if (!candidate || typeof candidate !== "object" || typeof candidate.id !== "string") {
+    return null;
+  }
+
+  const text = asString(candidate.text).trim().slice(0, focusListInput.maxLength);
+  if (!text) {
+    return null;
+  }
+
+  return { id: candidate.id, text, done: Boolean(candidate.done) };
+}
+
+function readFocusList() {
+  const rawList = safeGet(FOCUS_LIST_KEY);
+  if (!rawList) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawList);
+    if (parsed?.version !== 1 || !Array.isArray(parsed.items)) {
+      return [];
+    }
+    return parsed.items.map(normalizeFocusItem).filter(Boolean).slice(0, 12);
+  } catch {
+    return [];
+  }
+}
+
+function persistFocusList() {
+  return safeSet(FOCUS_LIST_KEY, JSON.stringify({ version: 1, items: focusList }));
+}
+
+function updateFocusListStatus(message) {
+  const remaining = focusList.filter((item) => !item.done).length;
+  focusListStatus.textContent = message || (focusList.length === 0
+    ? "No next steps yet."
+    : `${remaining} open ${remaining === 1 ? "step" : "steps"} saved in this browser.`);
+}
+
+function renderFocusList() {
+  focusListItems.replaceChildren();
+
+  focusList.forEach((item) => {
+    const listItem = document.createElement("li");
+    listItem.className = "focus-list-item";
+    listItem.dataset.done = String(item.done);
+
+    const doneToggle = document.createElement("input");
+    doneToggle.type = "checkbox";
+    doneToggle.checked = item.done;
+    doneToggle.setAttribute("aria-label", `Mark ${item.text} ${item.done ? "not done" : "done"}`);
+    doneToggle.addEventListener("change", () => {
+      focusList = focusList.map((entry) => entry.id === item.id ? { ...entry, done: doneToggle.checked } : entry);
+      const saved = persistFocusList();
+      renderFocusList();
+      updateFocusListStatus(saved ? "Focus List updated in this browser." : "This browser could not save that change.");
+    });
+
+    const text = document.createElement("span");
+    text.textContent = item.text;
+
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "Remove";
+    removeButton.setAttribute("aria-label", `Remove ${item.text}`);
+    removeButton.addEventListener("click", () => {
+      focusList = focusList.filter((entry) => entry.id !== item.id);
+      const saved = persistFocusList();
+      renderFocusList();
+      updateFocusListStatus(saved ? "Step removed from this browser." : "This browser could not remove that step.");
+    });
+
+    listItem.append(doneToggle, text, removeButton);
+    focusListItems.append(listItem);
+  });
+
+  updateFocusListStatus();
+}
+
+function addFocusListItem(event) {
+  event.preventDefault();
+  const text = focusListInput.value.trim().replace(/\s+/g, " ").slice(0, focusListInput.maxLength);
+  if (!text) {
+    updateFocusListStatus("Write a short next step before adding it.");
+    focusListInput.focus();
+    return;
+  }
+  if (focusList.some((item) => item.text.toLocaleLowerCase() === text.toLocaleLowerCase())) {
+    updateFocusListStatus("That step is already on this Focus List.");
+    focusListInput.focus();
+    return;
+  }
+  if (focusList.length >= 12) {
+    updateFocusListStatus("Keep this list small: remove a step before adding another.");
+    return;
+  }
+
+  focusList = [{ id: crypto.randomUUID(), text, done: false }, ...focusList];
+  const saved = persistFocusList();
+  focusListInput.value = "";
+  renderFocusList();
+  updateFocusListStatus(saved ? "Next step saved in this browser." : "This browser could not save that step.");
+}
+
+function initializeFocusList() {
+  focusList = readFocusList();
+  renderFocusList();
+}
+
 function appendConsoleLine(text, className = "") {
   const line = document.createElement("p");
   line.textContent = text;
@@ -952,7 +1069,7 @@ function runBrowserOnlyCommand(rawCommand) {
   };
 
   if (command === "help") {
-    appendConsoleLine("Commands: help, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, theme paper|night|moss|ember, status, clear.");
+    appendConsoleLine("Commands: help, open focus, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, theme paper|night|moss|ember, status, clear.");
     return;
   }
 
@@ -971,6 +1088,7 @@ function runBrowserOnlyCommand(rawCommand) {
       snapshot: "snapshot",
       launchpad: "launchpad",
       console: "console",
+      focus: "focus-list",
     };
     if (Object.hasOwn(names, command.slice(5))) {
       openWindow(names[command.slice(5)]);
@@ -1506,6 +1624,7 @@ function bindGlobalControls() {
   signalStartButton.addEventListener("click", startSignalSprint);
   signalPressButton.addEventListener("click", pressSignalSprint);
   deskGridNewButton.addEventListener("click", createDeskGrid);
+  focusListForm.addEventListener("submit", addFocusListItem);
   gameTabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setActiveGamePanel(tab.dataset.gameTab, { focusTab: false }));
     tab.addEventListener("keydown", (event) => {
@@ -1649,6 +1768,7 @@ function initialize() {
   initializeWritingTools();
   initializeGames();
   initializeLocalActivity();
+  initializeFocusList();
   applyLayout();
   bindWindowControls();
   bindGlobalControls();
