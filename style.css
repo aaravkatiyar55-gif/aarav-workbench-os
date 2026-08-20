@@ -157,6 +157,31 @@ textarea:focus-visible,
 .brand-name { margin: 0.12rem 0 0; font-size: 1rem; font-weight: 800; }
 .topbar-actions { gap: 0.55rem; }
 .clock { min-width: 10.8rem; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.window-strip {
+  display: flex;
+  max-width: min(28vw, 20rem);
+  gap: 0.3rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.window-strip-item,
+.window-strip-empty {
+  min-height: 2.25rem;
+  flex: 0 0 auto;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--window);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.window-strip-item:hover,
+.window-strip-item[aria-current="true"] { border-color: var(--teal); color: var(--ink); }
+.window-strip-item[aria-current="true"] { background: var(--paper-deep); }
+.window-strip-empty { display: grid; place-items: center; border-style: dashed; }
 
 .quiet-button,
 .primary-button,
@@ -693,6 +718,7 @@ kbd {
   .topbar-actions { flex-wrap: wrap; justify-content: flex-end; }
   .clock { min-width: 0; }
   .command-button kbd { display: none; }
+  .window-strip { display: none; }
   .dock { overflow-x: auto; justify-content: flex-start; }
   .dock-item { flex: 0 0 auto; min-width: 4.8rem; }
 }

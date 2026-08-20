@@ -1,4 +1,5 @@
 import { projects } from "./projects.js";
+import { renderWindowStrip } from "./window-strip.js";
 
 const STORAGE_PREFIX = "aarav-workbench-os";
 const LAYOUT_KEY = `${STORAGE_PREFIX}.layout.v2`;
@@ -26,6 +27,7 @@ const THEMES = {
 const desktop = document.querySelector("#desktop");
 const statusMessage = document.querySelector("#status-message");
 const clock = document.querySelector("#clock");
+const windowStrip = document.querySelector("#window-strip");
 const deskModePicker = document.querySelector("#desk-mode-picker");
 const themeToggle = document.querySelector("#theme-toggle");
 const commandDialog = document.querySelector("#command-dock");
@@ -330,6 +332,22 @@ function updateLayoutSummary() {
   const visibleWindows = openWindows.length - minimizedWindows.length;
   layoutSummary.textContent = `${visibleWindows} visible, ${minimizedWindows.length} minimized. This layout is saved only in this browser.`;
   landingPanel.hidden = visibleWindows > 0;
+  renderWindowStrip(
+    windowStrip,
+    windowElements.map((windowElement) => ({
+      id: windowElement.dataset.windowId,
+      title: friendlyTitle(windowElement),
+      isOpen: !windowElement.hidden,
+      isMinimized: windowElement.dataset.minimized === "true",
+    })),
+    activeWindowId,
+    (windowId) => {
+      const windowElement = windowsById.get(windowId);
+      if (windowElement) {
+        restoreWindow(windowElement);
+      }
+    },
+  );
 }
 
 function serializeLayout() {
