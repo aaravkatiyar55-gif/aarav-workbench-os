@@ -1647,6 +1647,8 @@ function bindWindowControls() {
     titlebar.addEventListener("focus", () => {
       if (!windowElement.hidden) {
         bringToFront(windowElement);
+        updateLayoutSummary();
+        persistLayout();
       }
     });
     titlebar.addEventListener("pointerdown", (event) => startDrag(event, windowElement, titlebar));
