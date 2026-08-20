@@ -11,6 +11,7 @@ The public app has no sign-in, password, cloud sync, server-side storage, analyt
 ## Features
 
 - A quiet first landing with every app closed until the visitor chooses one from the landing actions, dock, or Command Dock
+- A small browser-local Recent Desk trail so returning visitors can reopen the last few tools without cluttering the landing screen
 - Multiple draggable, closable, minimizable, and maximizable windows with dock restore and front-of-stack focus
 - Live local clock, Command Dock (`Ctrl`/`Cmd` + `K`), and `Alt` + arrow movement for a focused title bar
 - Project Shelf with verified public source/demo links, plus Build Notes and Toolbox windows
@@ -32,6 +33,7 @@ All saved Workbench state is namespaced under `aarav-workbench-os.*` in the visi
 - theme and quieter-motion preference;
 - Notebook title/body and Story Journal text;
 - Focus List steps and completion state;
+- up to four recent Workbench app shortcuts; and
 - local check-in streak date/count; and
 - local best scores for the two games.
 

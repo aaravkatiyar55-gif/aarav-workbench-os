@@ -11,6 +11,7 @@ const SIGNAL_SPRINT_KEY = `${STORAGE_PREFIX}.signal-sprint.v1`;
 const DESK_GRID_KEY = `${STORAGE_PREFIX}.desk-grid.v1`;
 const STREAK_KEY = `${STORAGE_PREFIX}.streak.v1`;
 const FOCUS_LIST_KEY = `${STORAGE_PREFIX}.focus-list.v1`;
+const RECENT_APPS_KEY = `${STORAGE_PREFIX}.recent-apps.v1`;
 const LAYOUT_VERSION = 2;
 const MOVE_STEP = 24;
 const MAX_WALLPAPER_BYTES = 4 * 1024 * 1024;
@@ -74,6 +75,7 @@ const focusListForm = document.querySelector("#focus-list-form");
 const focusListInput = document.querySelector("#focus-list-input");
 const focusListItems = document.querySelector("#focus-list-items");
 const focusListStatus = document.querySelector("#focus-list-status");
+const recentAppsElement = document.querySelector("#recent-apps");
 const windowElements = [...document.querySelectorAll(".os-window")];
 const windowsById = new Map(windowElements.map((windowElement) => [windowElement.dataset.windowId, windowElement]));
 
@@ -100,6 +102,7 @@ let deskGridState = {
 };
 let currentStreak = { count: 0, lastCheckIn: null };
 let focusList = [];
+let recentApps = [];
 
 const DESK_GRID_PAIRS = [
   { symbol: "▲", name: "triangle" },
@@ -265,6 +268,54 @@ function updateAllDockItems() {
   windowElements.forEach(updateDockItem);
 }
 
+function readRecentApps() {
+  const rawRecentApps = safeGet(RECENT_APPS_KEY);
+  if (!rawRecentApps) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawRecentApps);
+    if (parsed?.version !== 1 || !Array.isArray(parsed.items)) {
+      return [];
+    }
+    return parsed.items.filter((id) => typeof id === "string" && windowsById.has(id)).slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
+function renderRecentApps() {
+  recentAppsElement.replaceChildren();
+  if (recentApps.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "recent-app-empty";
+    empty.textContent = "Nothing opened yet. Pick a tool above or use the dock.";
+    recentAppsElement.append(empty);
+    return;
+  }
+
+  recentApps.forEach((windowId) => {
+    const windowElement = windowsById.get(windowId);
+    if (!windowElement) {
+      return;
+    }
+    const button = document.createElement("button");
+    button.className = "recent-app";
+    button.type = "button";
+    button.textContent = `Open ${friendlyTitle(windowElement)}`;
+    button.addEventListener("click", () => restoreWindow(windowElement));
+    recentAppsElement.append(button);
+  });
+}
+
+function recordRecentApp(windowId) {
+  recentApps = [windowId, ...recentApps.filter((id) => id !== windowId)].slice(0, 4);
+  const saved = safeSet(RECENT_APPS_KEY, JSON.stringify({ version: 1, items: recentApps }));
+  renderRecentApps();
+  return saved;
+}
+
 function updateLayoutSummary() {
   const openWindows = windowElements.filter((windowElement) => !windowElement.hidden);
   const minimizedWindows = openWindows.filter((windowElement) => windowElement.dataset.minimized === "true");
@@ -356,6 +407,7 @@ function restoreWindow(windowElement) {
     recordLocalCheckIn();
   }
   focusWindow(windowElement, { shouldFocus: true, announceFocus: true });
+  recordRecentApp(windowElement.dataset.windowId);
   persistLayout();
 }
 
@@ -1028,6 +1080,11 @@ function addFocusListItem(event) {
 function initializeFocusList() {
   focusList = readFocusList();
   renderFocusList();
+}
+
+function initializeRecentApps() {
+  recentApps = readRecentApps();
+  renderRecentApps();
 }
 
 function appendConsoleLine(text, className = "") {
@@ -1769,6 +1826,7 @@ function initialize() {
   initializeGames();
   initializeLocalActivity();
   initializeFocusList();
+  initializeRecentApps();
   applyLayout();
   bindWindowControls();
   bindGlobalControls();

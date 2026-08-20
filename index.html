@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v6" />
+    <link rel="stylesheet" href="style.css?v=workspace-v7" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -47,6 +47,16 @@
           <button type="button" class="quiet-button" data-open-window="projects">Browse projects</button>
           <button type="button" class="quiet-button" data-open-window="games">Take a desk break</button>
         </div>
+        <section class="landing-recents" aria-labelledby="recent-apps-title">
+          <div class="window-heading-row">
+            <div>
+              <p class="window-kicker">Your local desk trail</p>
+              <h2 id="recent-apps-title">Return to a recent tool.</h2>
+            </div>
+            <span class="count-label">This browser only</span>
+          </div>
+          <div id="recent-apps" class="recent-apps" aria-live="polite"></div>
+        </section>
         <p class="small-note">Tip: every window can be maximized, minimized, or closed. The dock is always available.</p>
       </section>
 
@@ -573,6 +583,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=workspace-v6"></script>
+    <script type="module" src="script.js?v=workspace-v7"></script>
   </body>
 </html>

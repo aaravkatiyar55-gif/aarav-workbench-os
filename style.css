@@ -272,6 +272,12 @@ kbd {
 .landing-panel h1 { margin: 0; max-width: 12ch; font-size: clamp(2.25rem, 6vw, 4.9rem); letter-spacing: -0.06em; line-height: 0.9; }
 .landing-panel > p:not(.window-kicker):not(.small-note) { max-width: 56ch; margin: 0; color: var(--muted); line-height: 1.55; }
 .landing-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.landing-recents { display: grid; gap: 0.55rem; max-width: 42rem; padding-top: 0.2rem; border-top: 1px solid var(--line); }
+.landing-recents h2 { margin: 0; font-size: 1rem; }
+.recent-apps { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.recent-app { padding: 0.45rem 0.6rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--window); color: var(--ink); font: inherit; font-size: 0.82rem; font-weight: 800; }
+.recent-app:hover { border-color: var(--teal); color: var(--teal-deep); }
+.recent-app-empty { margin: 0; color: var(--muted); font-size: 0.84rem; }
 
 .os-window {
   position: absolute;
