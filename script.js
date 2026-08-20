@@ -437,6 +437,25 @@ function restoreWindow(windowElement) {
   persistLayout();
 }
 
+function cycleVisibleWindow(direction = 1) {
+  const availableWindows = windowElements
+    .filter((windowElement) => !windowElement.hidden && windowElement.dataset.minimized !== "true")
+    .sort((first, second) => Number(first.style.zIndex) - Number(second.style.zIndex));
+
+  if (availableWindows.length === 0) {
+    announce("No open windows to switch between. Open one from the dock first.");
+    return;
+  }
+
+  const currentIndex = availableWindows.findIndex((windowElement) => windowElement.dataset.windowId === activeWindowId);
+  const startIndex = currentIndex >= 0 ? currentIndex : 0;
+  const nextIndex = (startIndex + direction + availableWindows.length) % availableWindows.length;
+  const nextWindow = availableWindows[nextIndex];
+
+  focusWindow(nextWindow, { shouldFocus: true, announceFocus: true });
+  persistLayout();
+}
+
 function openDeskMode(mode) {
   const windowIds = DESK_MODES[mode];
   if (!windowIds) {
@@ -1186,12 +1205,24 @@ function runBrowserOnlyCommand(rawCommand) {
   };
 
   if (command === "help") {
-    appendConsoleLine("Commands: help, open focus, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, theme paper|night|moss|ember, status, clear.");
+    appendConsoleLine("Commands: help, open focus, open notebook, open games, open journal, open themes, open projects, open snapshot, open launchpad, next, previous, theme paper|night|moss|ember, status, clear.");
     return;
   }
 
   if (command === "clear") {
     clearConsoleOutput();
+    return;
+  }
+
+  if (command === "next" || command === "next window") {
+    cycleVisibleWindow(1);
+    appendConsoleLine("Moved to the next open Workbench window.");
+    return;
+  }
+
+  if (command === "previous" || command === "previous window") {
+    cycleVisibleWindow(-1);
+    appendConsoleLine("Moved to the previous open Workbench window.");
     return;
   }
 
@@ -1552,6 +1583,18 @@ function commandDefinitions() {
       run: resetLayout,
     },
     {
+      id: "next-open-window",
+      label: "Focus next open window",
+      detail: "Cycle through visible apps with Alt + PageDown",
+      run: () => cycleVisibleWindow(1),
+    },
+    {
+      id: "previous-open-window",
+      label: "Focus previous open window",
+      detail: "Cycle through visible apps with Alt + PageUp",
+      run: () => cycleVisibleWindow(-1),
+    },
+    {
       id: "cycle-theme",
       label: "Cycle workspace theme",
       detail: "Switch between Paper, Night, Moss, and Ember",
@@ -1847,6 +1890,18 @@ function bindGlobalControls() {
     if (event.key === "Escape" && commandDialog.open) {
       event.preventDefault();
       closeCommandDock();
+      return;
+    }
+
+    if (
+      event.altKey
+      && !event.ctrlKey
+      && !event.metaKey
+      && ["PageUp", "PageDown"].includes(event.key)
+      && !event.target.closest?.("input, textarea, select")
+    ) {
+      event.preventDefault();
+      cycleVisibleWindow(event.key === "PageDown" ? 1 : -1);
       return;
     }
 

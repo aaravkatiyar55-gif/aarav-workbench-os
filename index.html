@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v10" />
+    <link rel="stylesheet" href="style.css?v=workspace-v11" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -450,7 +450,7 @@
           <form id="console-form" class="console-form">
             <label class="console-field" for="console-input">
               <span>Try a Workbench command</span>
-              <input id="console-input" type="text" maxlength="120" autocomplete="off" spellcheck="false" placeholder="help, open notebook, theme moss" />
+              <input id="console-input" type="text" maxlength="120" autocomplete="off" spellcheck="false" placeholder="help, open notebook, next window" />
             </label>
             <button id="console-run" class="primary-button" type="button">Run</button>
           </form>
@@ -590,7 +590,7 @@
         <input id="command-search" type="search" placeholder="Open projects, reset layout…" autocomplete="off" />
       </label>
       <div id="command-results" class="command-results" role="listbox" aria-label="Available commands"></div>
-      <p class="dialog-help"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> run <kbd>Esc</kbd> close</p>
+      <p class="dialog-help"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> run <kbd>Esc</kbd> close · <kbd>Alt</kbd> + <kbd>PgUp</kbd>/<kbd>PgDn</kbd> switches open windows</p>
     </dialog>
 
     <dialog id="clear-data-dialog" class="confirm-dialog" aria-labelledby="clear-data-title" aria-describedby="clear-data-description">
@@ -605,6 +605,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=workspace-v10"></script>
+    <script type="module" src="script.js?v=workspace-v11"></script>
   </body>
 </html>
