@@ -12,7 +12,7 @@ The public app has no sign-in, password, cloud sync, server-side storage, analyt
 
 - A quiet first landing with every app closed until the visitor chooses one from the landing actions, dock, or Command Dock
 - A small browser-local Recent Desk trail so returning visitors can reopen the last few tools without cluttering the landing screen
-- Three Desk Modes—Explore, Focus, and Break—that open a purposeful set of tools and minimize the rest without closing or deleting anything
+- Three Desk Modes—Explore, Focus, and Break—available from both the landing view and the top bar. Each opens a purposeful set of tools and minimizes the rest without closing or deleting anything
 - Multiple draggable, closable, minimizable, and maximizable windows with dock restore and front-of-stack focus
 - Live local clock, Command Dock (`Ctrl`/`Cmd` + `K`), and `Alt` + arrow movement for a focused title bar
 - Project Shelf with verified public source/demo links, plus Build Notes and Toolbox windows

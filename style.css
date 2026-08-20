@@ -140,6 +140,8 @@ textarea:focus-visible,
   display: flex;
   align-items: center;
 }
+.desk-mode-picker select { min-height: 2.5rem; padding: 0.42rem 0.55rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--window); color: var(--ink); font: inherit; font-size: 0.82rem; font-weight: 800; }
+.desk-mode-picker select:hover { border-color: var(--teal); }
 
 .brand-lockup { gap: 0.7rem; }
 .brand-mark { width: 2.25rem; height: 2.25rem; color: var(--signal); }

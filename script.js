@@ -26,6 +26,7 @@ const THEMES = {
 const desktop = document.querySelector("#desktop");
 const statusMessage = document.querySelector("#status-message");
 const clock = document.querySelector("#clock");
+const deskModePicker = document.querySelector("#desk-mode-picker");
 const themeToggle = document.querySelector("#theme-toggle");
 const commandDialog = document.querySelector("#command-dock");
 const commandSearch = document.querySelector("#command-search");
@@ -1723,6 +1724,13 @@ function bindGlobalControls() {
   signalPressButton.addEventListener("click", pressSignalSprint);
   deskGridNewButton.addEventListener("click", createDeskGrid);
   focusListForm.addEventListener("submit", addFocusListItem);
+  deskModePicker.addEventListener("change", () => {
+    if (!deskModePicker.value) {
+      return;
+    }
+    openDeskMode(deskModePicker.value);
+    deskModePicker.value = "";
+  });
   deskModeButtons.forEach((button) => {
     button.addEventListener("click", () => openDeskMode(button.dataset.deskMode));
   });

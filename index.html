@@ -8,7 +8,7 @@
       content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
     />
     <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v8" />
+    <link rel="stylesheet" href="style.css?v=workspace-v9" />
   </head>
   <body data-theme="paper">
     <a class="skip-link" href="#desktop">Skip to desktop</a>
@@ -24,6 +24,15 @@
 
       <div class="topbar-actions">
         <time id="clock" class="clock" aria-label="Local time">Loading time</time>
+        <label class="desk-mode-picker" for="desk-mode-picker">
+          <span class="sr-only">Choose a desk mode</span>
+          <select id="desk-mode-picker">
+            <option value="">Desk mode</option>
+            <option value="explore">Explore desk</option>
+            <option value="focus">Focus desk</option>
+            <option value="break">Break desk</option>
+          </select>
+        </label>
         <button id="theme-toggle" class="quiet-button" type="button" aria-label="Cycle workspace theme. Current theme: Paper">
           Theme: Paper
         </button>
@@ -595,6 +604,6 @@
       </div>
     </dialog>
 
-    <script type="module" src="script.js?v=workspace-v8"></script>
+    <script type="module" src="script.js?v=workspace-v9"></script>
   </body>
 </html>
