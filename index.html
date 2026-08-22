@@ -1,610 +1,296 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Aarav Workbench OS is a local-first browser desktop for exploring Aarav's projects, build notes, and tools."
-    />
-    <title>Aarav Workbench OS</title>
-    <link rel="stylesheet" href="style.css?v=workspace-v11" />
-  </head>
-  <body data-theme="paper">
-    <a class="skip-link" href="#desktop">Skip to desktop</a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aarav's Study Desk</title>
+  <meta name="description" content="A lightweight, distraction-free study desk to pick one next action, take quick notes, and leave session handoffs.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#desk-main">Skip to study desk</a>
 
-    <header class="topbar" aria-label="Workbench controls">
-      <div class="brand-lockup">
-        <svg class="brand-mark" aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg>
-        <div>
-          <p class="eyebrow">Personal project desk</p>
-          <p class="brand-name">Aarav Workbench OS</p>
-        </div>
-      </div>
+  <!-- Top Desk Bar -->
+  <header class="desk-header" role="banner">
+    <div class="desk-brand">
+      <span class="desk-brand__icon" aria-hidden="true">📖</span>
+      <span class="desk-brand__title">Aarav's Study Desk</span>
+    </div>
 
-      <div class="topbar-actions">
-        <time id="clock" class="clock" aria-label="Local time">Loading time</time>
-        <nav id="window-strip" class="window-strip" aria-label="Open Workbench windows"></nav>
-        <label class="desk-mode-picker" for="desk-mode-picker">
-          <span class="sr-only">Choose a desk mode</span>
-          <select id="desk-mode-picker">
-            <option value="">Desk mode</option>
-            <option value="explore">Explore desk</option>
-            <option value="focus">Focus desk</option>
-            <option value="break">Break desk</option>
-          </select>
-        </label>
-        <button id="theme-toggle" class="quiet-button" type="button" aria-label="Cycle workspace theme. Current theme: Paper">
-          Theme: Paper
-        </button>
-        <button id="open-command-dock" class="command-button" type="button">
-          <svg aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg>
-          Command Dock <kbd>Ctrl K</kbd>
-        </button>
-      </div>
-    </header>
-
-    <main id="desktop" class="desktop" tabindex="-1" aria-label="Aarav Workbench desktop">
-      <p id="status-message" class="sr-only" aria-live="polite"></p>
-      <div class="desktop-label" aria-hidden="true">WORKBENCH / 01</div>
-
-      <section id="landing-panel" class="landing-panel" aria-labelledby="landing-title">
-        <p class="window-kicker">A quieter starting desk</p>
-        <h1 id="landing-title">Open one thing at a time.</h1>
-        <p>Choose a desk tool below, or use the dock when you know where you want to go. Your saved workspace still returns after you open something.</p>
-        <div class="landing-actions">
-          <button type="button" class="primary-button" data-open-window="welcome">Start here</button>
-          <button type="button" class="quiet-button" data-open-window="projects">Browse projects</button>
-          <button type="button" class="quiet-button" data-open-window="games">Take a desk break</button>
-        </div>
-        <section class="desk-modes" aria-labelledby="desk-modes-title">
-          <div>
-            <p class="window-kicker">Window recipes</p>
-            <h2 id="desk-modes-title">Set up a desk, not a mess.</h2>
-          </div>
-          <p class="small-note">A recipe opens its useful windows and minimizes the rest. Nothing is deleted; the dock can restore any app.</p>
-          <div class="desk-mode-actions">
-            <button class="desk-mode" type="button" data-desk-mode="explore"><strong>Explore</strong><span>Projects + build notes</span></button>
-            <button class="desk-mode" type="button" data-desk-mode="focus"><strong>Focus</strong><span>Focus List + Notebook</span></button>
-            <button class="desk-mode" type="button" data-desk-mode="break"><strong>Break</strong><span>Game Room only</span></button>
-          </div>
-        </section>
-        <section class="landing-recents" aria-labelledby="recent-apps-title">
-          <div class="window-heading-row">
-            <div>
-              <p class="window-kicker">Your local desk trail</p>
-              <h2 id="recent-apps-title">Return to a recent tool.</h2>
-            </div>
-            <span class="count-label">This browser only</span>
-          </div>
-          <div id="recent-apps" class="recent-apps" aria-live="polite"></div>
-        </section>
-        <p class="small-note">Tip: every window can be maximized, minimized, or closed. The dock is always available.</p>
-      </section>
-
-      <section
-        id="welcome-window"
-        class="os-window window-welcome"
-        data-window-id="welcome"
-        data-default-x="54"
-        data-default-y="58"
-        aria-labelledby="welcome-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Start Here window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span id="welcome-title" class="window-title">Start Here</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Start Here">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Start Here">×</button>
-          </span>
-        </header>
-        <div class="window-body intro-body">
-          <p class="window-kicker">A small desktop, not a portfolio template</p>
-          <h1>Welcome to the project desk.</h1>
-          <p>
-            This is a browser-based workbench for exploring the small tools, experiments, and build notes I am collecting while learning.
-          </p>
-          <div class="intro-actions">
-            <button type="button" class="primary-button" data-open-window="projects">Open Project Shelf</button>
-            <button type="button" class="text-button" data-open-window="notes">Read build notes <span aria-hidden="true">→</span></button>
-          </div>
-          <p class="small-note">Tip: drag a title bar, or use <kbd>Alt</kbd> + arrow keys when a window title is focused.</p>
-        </div>
-      </section>
-
-      <section
-        id="projects-window"
-        class="os-window window-projects"
-        data-window-id="projects"
-        data-default-x="428"
-        data-default-y="92"
-        aria-labelledby="projects-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Project Shelf window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg>
-          <span id="projects-title" class="window-title">Project Shelf</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Project Shelf">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Project Shelf">×</button>
-          </span>
-        </header>
-        <div class="window-body project-body">
-          <div class="window-heading-row">
-            <div>
-              <p class="window-kicker">A few things on the bench</p>
-              <h2>Projects worth opening.</h2>
-            </div>
-            <span id="project-count" class="count-label" aria-live="polite"></span>
-          </div>
-          <label class="search-field" for="project-search">
-            <span>Find a project</span>
-            <input id="project-search" type="search" placeholder="Try “focus” or “local”" autocomplete="off" />
-          </label>
-          <div id="project-list" class="project-list" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <section
-        id="notes-window"
-        class="os-window window-notes"
-        data-window-id="notes"
-        data-default-x="860"
-        data-default-y="120"
-        aria-labelledby="notes-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Build Notes window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
-          <span id="notes-title" class="window-title">Build Notes</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Build Notes">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Build Notes">×</button>
-          </span>
-        </header>
-        <div class="window-body notes-body">
-          <p class="window-kicker">What this desk is for</p>
-          <h2>Keep the useful bits close.</h2>
-          <ol class="build-notes">
-            <li>
-              <span class="note-number">01</span>
-              <p><strong>Start with one honest problem.</strong> Small tools become clearer when the first screen explains why they exist.</p>
-            </li>
-            <li>
-              <span class="note-number">02</span>
-              <p><strong>Keep local things local.</strong> This desktop keeps its own layout, theme, and writing drafts in the browser.</p>
-            </li>
-            <li>
-              <span class="note-number">03</span>
-              <p><strong>Leave room for the next iteration.</strong> Every window can close, return from the dock, and pick up where it left off.</p>
-            </li>
-          </ol>
-        </div>
-      </section>
-
-      <section
-        id="toolbox-window"
-        class="os-window window-toolbox"
-        data-window-id="toolbox"
-        data-default-x="1218"
-        data-default-y="315"
-        aria-labelledby="toolbox-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Toolbox window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg>
-          <span id="toolbox-title" class="window-title">Toolbox</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Toolbox">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Toolbox">×</button>
-          </span>
-        </header>
-        <div class="window-body toolbox-body">
-          <p class="window-kicker">Things behind the projects</p>
-          <h2>Small, practical tools.</h2>
-          <ul class="tool-list">
-            <li><span>Web</span><strong>HTML · CSS · JavaScript</strong></li>
-            <li><span>Editor</span><strong>VS Code</strong></li>
-            <li><span>Versioning</span><strong>Git · GitHub</strong></li>
-            <li><span>Publishing</span><strong>GitHub Pages</strong></li>
-          </ul>
-          <p class="small-note">No login, server account, or hidden data is needed to explore this OS.</p>
-        </div>
-      </section>
-
-      <section
-        id="notebook-window"
-        class="os-window window-notebook"
-        data-window-id="notebook"
-        data-default-x="454"
-        data-default-y="432"
-        data-start-minimized="true"
-        aria-labelledby="notebook-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Notebook window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
-          <span id="notebook-title" class="window-title">Notebook</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Notebook">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Notebook">×</button>
-          </span>
-        </header>
-        <div class="window-body writing-body">
-          <p class="window-kicker">Browser-local note</p>
-          <h2>Leave yourself a useful note.</h2>
-          <p class="small-note writing-intro">Saved in this browser while you type and not shared by Workbench. It is not encrypted, so do not use it for sensitive information on a shared device.</p>
-          <label class="writing-field" for="notebook-title-input">
-            <span>Note title</span>
-            <input id="notebook-title-input" type="text" maxlength="120" placeholder="e.g. Things to improve next" autocomplete="off" />
-          </label>
-          <label class="writing-field" for="notebook-body-input">
-            <span>Note</span>
-            <textarea id="notebook-body-input" rows="6" maxlength="6000" placeholder="Write a thought, a plan, or a small reminder…"></textarea>
-          </label>
-          <div class="writing-actions">
-            <button id="clear-notebook" class="quiet-button" type="button">Clear notebook</button>
-            <p id="notebook-status" class="save-status" aria-live="polite">Nothing has been written yet.</p>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="themes-window"
-        class="os-window window-themes"
-        data-window-id="themes"
-        data-default-x="74"
-        data-default-y="352"
-        data-start-minimized="true"
-        aria-labelledby="themes-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Theme Lab window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg>
-          <span id="themes-title" class="window-title">Theme Lab</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Theme Lab">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Theme Lab">×</button>
-          </span>
-        </header>
-        <div class="window-body theme-body">
-          <p class="window-kicker">Saved on this device</p>
-          <h2>Change the desk, not your data.</h2>
-          <div class="theme-grid" role="group" aria-label="Choose a workbench theme">
-            <button class="theme-choice" type="button" data-theme-choice="paper"><span class="theme-swatch swatch-paper" aria-hidden="true"></span><strong>Paper</strong><small>Warm and clear</small></button>
-            <button class="theme-choice" type="button" data-theme-choice="night"><span class="theme-swatch swatch-night" aria-hidden="true"></span><strong>Night</strong><small>Low-light desk</small></button>
-            <button class="theme-choice" type="button" data-theme-choice="moss"><span class="theme-swatch swatch-moss" aria-hidden="true"></span><strong>Moss</strong><small>Quiet green</small></button>
-            <button class="theme-choice" type="button" data-theme-choice="ember"><span class="theme-swatch swatch-ember" aria-hidden="true"></span><strong>Ember</strong><small>Warm signal</small></button>
-          </div>
-          <label class="wallpaper-field" for="wallpaper-input">
-            <span>Temporary custom wallpaper</span>
-            <input id="wallpaper-input" type="file" accept="image/png,image/jpeg,image/webp" />
-          </label>
-          <p id="wallpaper-status" class="save-status" role="status">Built-in themes are saved. A chosen image lasts only for this open tab and is never uploaded.</p>
-          <div class="theme-actions">
-            <button id="reset-wallpaper" class="quiet-button" type="button" disabled>Remove temporary wallpaper</button>
-            <button id="performance-mode-toggle" class="quiet-button" type="button" aria-pressed="false">Use quieter motion</button>
-          </div>
-          <p id="performance-status" class="small-note">Quieter motion affects this WebOS only; it does not optimize your computer.</p>
-        </div>
-      </section>
-
-      <section
-        id="journal-window"
-        class="os-window window-journal"
-        data-window-id="journal"
-        data-default-x="840"
-        data-default-y="424"
-        data-start-minimized="true"
-        aria-labelledby="journal-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Story Journal window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
-          <span id="journal-title" class="window-title">Story Journal</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Story Journal">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Story Journal">×</button>
-          </span>
-        </header>
-        <div class="window-body writing-body">
-          <p class="window-kicker">Browser-local draft</p>
-          <h2>Write a little of your story.</h2>
-          <p class="small-note writing-intro">Typed draft text stays in this browser and is not encrypted, so avoid sensitive information on a shared device. If you choose voice input, your browser may send spoken audio to its own speech service; avoid dictating sensitive information. Workbench does not record audio, create a profile, match people, or publish anything.</p>
-          <label class="writing-field" for="journal-input">
-            <span>Your draft</span>
-            <textarea id="journal-input" rows="8" maxlength="12000" placeholder="A small memory, an idea, or something you want to remember…"></textarea>
-          </label>
-          <div class="voice-controls">
-            <label class="speech-language" for="speech-language">
-              <span>Voice language</span>
-              <select id="speech-language">
-                <option value="en-IN">English (India)</option>
-                <option value="hi-IN">Hindi</option>
-                <option value="en-US">English (US)</option>
-              </select>
-            </label>
-            <button id="start-dictation" class="quiet-button" type="button">Start voice input</button>
-            <button id="stop-dictation" class="quiet-button" type="button" disabled>Stop voice input</button>
-          </div>
-          <p id="voice-status" class="save-status" role="status">Typing is always available. Voice input depends on this browser.</p>
-          <div class="writing-actions">
-            <button id="clear-journal" class="quiet-button" type="button">Clear journal</button>
-            <p id="journal-status" class="save-status" aria-live="polite">Nothing has been written yet.</p>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="games-window"
-        class="os-window window-games"
-        data-window-id="games"
-        data-default-x="1174"
-        data-default-y="418"
-        data-start-minimized="true"
-        aria-labelledby="games-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Game Room window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg>
-          <span id="games-title" class="window-title">Game Room</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Game Room">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Game Room">×</button>
-          </span>
-        </header>
-        <div class="window-body games-body">
-          <p class="window-kicker">Offline desk breaks</p>
-          <h2>Two small games, no account needed.</h2>
-
-          <div class="game-tabs" role="tablist" aria-label="Choose a desk game">
-            <button id="signal-game-tab" type="button" role="tab" aria-selected="true" aria-controls="signal-game-panel" data-game-tab="signal">Signal Sprint</button>
-            <button id="grid-game-tab" type="button" role="tab" aria-selected="false" aria-controls="grid-game-panel" data-game-tab="grid" tabindex="-1">Desk Grid</button>
-          </div>
-
-          <section id="signal-game-panel" class="game-card" role="tabpanel" aria-labelledby="signal-game-tab" data-game-panel="signal">
-            <div class="game-heading">
-              <div>
-                <p class="game-label">Reaction game</p>
-                <h3 id="signal-sprint-title">Signal Sprint</h3>
-              </div>
-              <output id="signal-best" class="game-score">Best: —</output>
-            </div>
-            <p id="signal-status" class="game-status" role="status">Start a run, wait for the signal, then press now.</p>
-            <div class="game-actions">
-              <button id="signal-start" class="primary-button" type="button">Start signal run</button>
-              <button id="signal-press" class="quiet-button" type="button" disabled>Press now</button>
-            </div>
-            <p class="small-note">Keyboard: focus “Press now” and use <kbd>Space</kbd>. A too-early press ends the run.</p>
-          </section>
-
-          <section id="grid-game-panel" class="game-card" role="tabpanel" aria-labelledby="grid-game-tab" data-game-panel="grid" hidden>
-            <div class="game-heading">
-              <div>
-                <p class="game-label">Memory game</p>
-                <h3 id="desk-grid-title">Desk Grid</h3>
-              </div>
-              <output id="desk-grid-best" class="game-score">Best: —</output>
-            </div>
-            <p id="desk-grid-status" class="game-status" role="status">Match the six pairs in as few turns as you can.</p>
-            <div id="desk-grid" class="desk-grid" role="group" aria-label="Desk Grid cards"></div>
-            <div class="game-actions">
-              <button id="desk-grid-new" class="quiet-button" type="button">New board</button>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <section
-        id="snapshot-window"
-        class="os-window window-snapshot"
-        data-window-id="snapshot"
-        data-default-x="54"
-        data-default-y="485"
-        data-start-minimized="true"
-        aria-labelledby="snapshot-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Workspace Snapshot window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg>
-          <span id="snapshot-title" class="window-title">Workspace Snapshot</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Workspace Snapshot">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Workspace Snapshot">×</button>
-          </span>
-        </header>
-        <div class="window-body snapshot-body">
-          <p class="window-kicker">Guide-extra feature</p>
-          <h2>Remember this desk.</h2>
-          <p id="layout-summary">Your current window layout can be saved to this browser.</p>
-          <div class="snapshot-actions">
-            <button id="save-workspace" class="primary-button" type="button">Save workspace</button>
-            <button id="reset-layout" class="quiet-button" type="button">Reset layout</button>
-          </div>
-          <p class="small-note">Saved locally on this device. Nothing is sent anywhere.</p>
-        </div>
-      </section>
-
-      <section
-        id="console-window"
-        class="os-window window-console"
-        data-window-id="console"
-        data-default-x="496"
-        data-default-y="704"
-        data-start-minimized="true"
-        aria-labelledby="console-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Workbench Console window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg>
-          <span id="console-title" class="window-title">Workbench Console</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Workbench Console">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Workbench Console">×</button>
-          </span>
-        </header>
-        <div class="window-body console-body">
-          <p class="window-kicker">Safe local control</p>
-          <h2>Browser-only commands.</h2>
-          <p class="console-boundary">This is not a system terminal. It cannot run PowerShell, open files, or control apps on your computer.</p>
-          <form id="console-form" class="console-form">
-            <label class="console-field" for="console-input">
-              <span>Try a Workbench command</span>
-              <input id="console-input" type="text" maxlength="120" autocomplete="off" spellcheck="false" placeholder="help, open notebook, home" />
-            </label>
-            <button id="console-run" class="primary-button" type="button">Run</button>
-          </form>
-          <div id="console-output" class="console-output" role="log" aria-live="polite" aria-label="Workbench Console output">
-            <p>Type <code>help</code> to see the small set of browser-only commands.</p>
-          </div>
-          <div class="console-actions">
-            <button id="console-clear" class="quiet-button" type="button">Clear output</button>
-            <p class="small-note">Output is temporary and is not saved.</p>
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="launchpad-window"
-        class="os-window window-launchpad"
-        data-window-id="launchpad"
-        data-default-x="978"
-        data-default-y="690"
-        data-start-minimized="true"
-        aria-labelledby="launchpad-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Launchpad window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg>
-          <span id="launchpad-title" class="window-title">Launchpad</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Launchpad">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Launchpad">×</button>
-          </span>
-        </header>
-        <div class="window-body launchpad-body">
-          <p class="window-kicker">Direct links and local activity</p>
-          <h2>Leave the desk when you want.</h2>
-          <p class="small-note">These open their official websites in a new tab. Workbench does not sign in, embed, control them, or change their advertising.</p>
-          <div class="launchpad-links" aria-label="Open official websites">
-            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span></a>
-            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span></a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
-          </div>
-          <section class="streak-card" aria-labelledby="streak-title">
-            <div>
-              <p class="game-label">Local check-in</p>
-              <h3 id="streak-title">A tiny desk streak.</h3>
-            </div>
-            <output id="streak-count" class="streak-count">0 days</output>
-            <p id="streak-status" class="small-note" role="status">Open a local Workbench tool to begin a local check-in streak.</p>
-            <p class="small-note">Badges are local only, non-transferable, and have no monetary value.</p>
-          </section>
-        </div>
-      </section>
-
-      <section
-        id="focus-list-window"
-        class="os-window window-focus-list"
-        data-window-id="focus-list"
-        data-default-x="682"
-        data-default-y="300"
-        data-start-minimized="true"
-        aria-labelledby="focus-list-title"
-      >
-        <header class="window-titlebar" data-drag-handle tabindex="0" aria-label="Drag or move Focus List window">
-          <span class="window-grip" aria-hidden="true"><span></span><span></span><span></span></span>
-          <svg class="window-icon" aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg>
-          <span id="focus-list-title" class="window-title">Focus List</span>
-          <span class="window-actions">
-            <button class="window-action" type="button" data-action="minimize" aria-label="Minimize Focus List">−</button>
-            <button class="window-action close-action" type="button" data-action="close" aria-label="Close Focus List">×</button>
-          </span>
-        </header>
-        <div class="window-body focus-list-body">
-          <p class="window-kicker">A small local reset</p>
-          <h2>Pick one useful next step.</h2>
-          <p class="small-note">This list stays in this browser. Keep it light: a next task, not your whole life.</p>
-          <form id="focus-list-form" class="focus-list-form">
-            <label class="writing-field" for="focus-list-input">
-              <span>Add a next step</span>
-              <input id="focus-list-input" type="text" maxlength="140" autocomplete="off" placeholder="e.g. Review the project shelf copy" />
-            </label>
-            <button class="primary-button" type="submit">Add step</button>
-          </form>
-          <p id="focus-list-status" class="save-status" role="status">No next steps yet.</p>
-          <ul id="focus-list-items" class="focus-list-items" aria-label="Saved next steps"></ul>
-        </div>
-      </section>
-    </main>
-
-    <nav class="dock" aria-label="Open applications">
-      <button type="button" class="dock-item" data-open-window="welcome" aria-label="Open Start Here">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg><span>Start</span>
+    <!-- Window Launcher Controls -->
+    <nav class="desk-launcher-dock" aria-label="Window launchers">
+      <button type="button" class="launcher-btn" data-target="win-today" aria-expanded="false">
+        <span aria-hidden="true">🎯</span>
+        <span>Today's Task</span>
       </button>
-      <button type="button" class="dock-item" data-open-window="projects" aria-label="Open Project Shelf">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg><span>Projects</span>
+      <button type="button" class="launcher-btn" data-target="win-scratchpad" aria-expanded="false">
+        <span aria-hidden="true">📝</span>
+        <span>Scratchpad</span>
       </button>
-      <button type="button" class="dock-item" data-open-window="notes" aria-label="Open Build Notes">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Notes</span>
+      <button type="button" class="launcher-btn" data-target="win-handoff" aria-expanded="false">
+        <span aria-hidden="true">🔄</span>
+        <span>Handoff</span>
       </button>
-      <button type="button" class="dock-item" data-open-window="toolbox" aria-label="Open Toolbox">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Tools</span>
+      <button type="button" class="launcher-btn" data-target="win-rescue" aria-expanded="false">
+        <span aria-hidden="true">⚡</span>
+        <span>5-Min Rescue</span>
       </button>
-      <button type="button" class="dock-item" data-open-window="themes" aria-label="Open Theme Lab">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#tool"></use></svg><span>Themes</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="notebook" aria-label="Open Notebook">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Notebook</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="journal" aria-label="Open Story Journal">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Journal</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="games" aria-label="Open Game Room">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#mark"></use></svg><span>Games</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="console" aria-label="Open Workbench Console">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#command"></use></svg><span>Console</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="launchpad" aria-label="Open Launchpad">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#folder"></use></svg><span>Launchpad</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="focus-list" aria-label="Open Focus List">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#note"></use></svg><span>Focus</span>
-      </button>
-      <button type="button" class="dock-item" data-open-window="snapshot" aria-label="Open Workspace Snapshot">
-        <svg aria-hidden="true"><use href="assets/workbench-icons.svg#snapshot"></use></svg><span>Snapshot</span>
+      <button type="button" class="launcher-btn" data-target="win-projects" aria-expanded="false">
+        <span aria-hidden="true">📚</span>
+        <span>Project Shelf</span>
       </button>
     </nav>
 
-    <dialog id="command-dock" class="command-dock" aria-labelledby="command-dock-title">
-      <div class="command-dialog-header">
-        <div>
-          <p class="window-kicker">Keyboard shortcut</p>
-          <h2 id="command-dock-title">Command Dock</h2>
-        </div>
-        <button id="close-command-dock" class="window-action close-action" type="button" aria-label="Close Command Dock">×</button>
-      </div>
-      <label class="command-search" for="command-search">
-        <span>Search commands</span>
-        <input id="command-search" type="search" placeholder="Open projects, reset layout…" autocomplete="off" />
-      </label>
-      <div id="command-results" class="command-results" role="listbox" aria-label="Available commands"></div>
-      <p class="dialog-help"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> run <kbd>Esc</kbd> close · <kbd>Alt</kbd> + <kbd>PgUp</kbd>/<kbd>PgDn</kbd> switches open windows</p>
-    </dialog>
+    <!-- Status: Live Desk Clock & Reset -->
+    <div class="desk-header-status">
+      <time id="desk-clock" class="desk-clock" aria-label="Current time">--:--</time>
+      <button type="button" id="reset-desk-btn" class="desk-reset-btn" title="Reset window positions and return to quiet desk">
+        Reset Desk
+      </button>
+    </div>
+  </header>
 
-    <dialog id="clear-data-dialog" class="confirm-dialog" aria-labelledby="clear-data-title" aria-describedby="clear-data-description">
-      <div class="confirm-dialog-body">
-        <p class="window-kicker">Local browser data</p>
-        <h2 id="clear-data-title">Clear saved writing?</h2>
-        <p id="clear-data-description">This removes only the selected Workbench writing draft from this browser.</p>
-        <div class="confirm-actions">
-          <button id="cancel-clear-data" class="quiet-button" type="button">Keep it</button>
-          <button id="confirm-clear-data" class="danger-button" type="button">Clear draft</button>
+  <!-- Resume Handoff Banner (Shows if a previous session left a handoff) -->
+  <aside id="resume-banner" class="resume-banner" hidden aria-label="Previous study handoff">
+    <div class="resume-banner-content">
+      <span class="resume-tag" aria-hidden="true">Last Handoff</span>
+      <p id="resume-text" class="resume-text"></p>
+    </div>
+    <div class="resume-actions">
+      <button type="button" id="adopt-handoff-btn" class="btn btn-primary btn-sm">Set as Today's Task</button>
+      <button type="button" id="dismiss-handoff-btn" class="btn btn-ghost btn-sm" aria-label="Dismiss handoff note">✕</button>
+    </div>
+  </aside>
+
+  <!-- Main Study Canvas -->
+  <main id="desk-main" class="desk-workspace" tabindex="-1">
+
+    <!-- Landing Overview Hub (Displays on fresh visit or when windows are closed) -->
+    <section id="desk-hub" class="desk-hub" aria-labelledby="hub-heading">
+      <div class="desk-hub-card">
+        <h1 id="hub-heading">Your Study Desk is Ready</h1>
+        <p class="desk-hub-subtitle">Choose what you want to focus on right now:</p>
+        <div class="desk-hub-actions">
+          <button type="button" class="hub-btn" data-target="win-today">
+            <strong>🎯 Open Today's Task</strong>
+            <span>Pick or add one realistic next step</span>
+          </button>
+          <button type="button" class="hub-btn" data-target="win-scratchpad">
+            <strong>📝 Open Scratchpad</strong>
+            <span>Jot down working thoughts or formulas</span>
+          </button>
+          <button type="button" class="hub-btn" data-target="win-handoff">
+            <strong>🔄 Resume Session Handoff</strong>
+            <span>Check where you left off earlier</span>
+          </button>
+          <button type="button" class="hub-btn" data-target="win-rescue">
+            <strong>⚡ 5-Minute Rescue</strong>
+            <span>Overcome study hesitation with a 5-min starter</span>
+          </button>
+          <button type="button" class="hub-btn" data-target="win-projects">
+            <strong>📚 Project Shelf</strong>
+            <span>View Aarav's verified projects & links</span>
+          </button>
         </div>
       </div>
-    </dialog>
+    </section>
 
-    <script type="module" src="script.js?v=workspace-v11"></script>
-  </body>
+    <!-- WINDOW 1: Today's Task Window -->
+    <article id="win-today" class="desk-window desk-window--today" aria-labelledby="today-win-title" role="region" hidden>
+      <header class="window-header">
+        <div class="window-title-wrap">
+          <span class="window-icon" aria-hidden="true">🎯</span>
+          <h2 id="today-win-title" class="window-title">Today's Focus</h2>
+        </div>
+        <div class="window-controls">
+          <button type="button" class="window-ctrl-btn ctrl-min" data-action="minimize" aria-label="Minimize Today window" title="Minimize">_</button>
+          <button type="button" class="window-ctrl-btn ctrl-close" data-action="close" aria-label="Close Today window" title="Close">✕</button>
+        </div>
+      </header>
+      <div class="window-body">
+        <!-- Single Next Action Banner -->
+        <div class="next-action-card" id="next-action-card">
+          <span class="next-action-badge">Single Next Action</span>
+          <h3 id="next-action-title" class="next-action-title">No tasks yet</h3>
+          <div class="next-action-meta" id="next-action-meta"></div>
+          <button type="button" id="next-action-complete-btn" class="btn btn-primary btn-sm next-complete-btn" hidden>Mark Complete ✓</button>
+        </div>
+
+        <!-- Add Task Form -->
+        <form id="add-task-form" class="task-form">
+          <label for="task-input" class="sr-only">Add study task</label>
+          <input type="text" id="task-input" class="input-text" placeholder="What is one realistic task to do next?" required maxlength="120" autocomplete="off">
+
+          <div class="task-form-row">
+            <div class="form-group">
+              <label for="task-estimate" class="form-label">Estimate</label>
+              <select id="task-estimate" class="input-select">
+                <option value="5">5 min</option>
+                <option value="15" selected>15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="task-energy" class="form-label">Energy</label>
+              <select id="task-energy" class="input-select">
+                <option value="low">Low Energy</option>
+                <option value="medium" selected>Medium Energy</option>
+                <option value="high">High Energy</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-accent task-submit-btn">Add to Desk</button>
+          </div>
+        </form>
+
+        <!-- Task Queue List -->
+        <div class="task-queue-section">
+          <div class="section-subhead">
+            <span class="subhead-title">Task Queue</span>
+            <span id="task-counter" class="task-counter">0 tasks</span>
+          </div>
+          <ul id="task-list" class="task-list" aria-live="polite"></ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- WINDOW 2: Scratchpad Window -->
+    <article id="win-scratchpad" class="desk-window desk-window--scratchpad" aria-labelledby="scratchpad-win-title" role="region" hidden>
+      <header class="window-header">
+        <div class="window-title-wrap">
+          <span class="window-icon" aria-hidden="true">📝</span>
+          <h2 id="scratchpad-win-title" class="window-title">Study Scratchpad</h2>
+        </div>
+        <div class="window-controls">
+          <button type="button" class="window-ctrl-btn ctrl-min" data-action="minimize" aria-label="Minimize Scratchpad window" title="Minimize">_</button>
+          <button type="button" class="window-ctrl-btn ctrl-close" data-action="close" aria-label="Close Scratchpad window" title="Close">✕</button>
+        </div>
+      </header>
+      <div class="window-body window-body--notebook">
+        <div class="scratchpad-header">
+          <label for="scratchpad-title" class="sr-only">Note Title</label>
+          <input type="text" id="scratchpad-title" class="scratchpad-title-input" placeholder="Topic / Subject..." maxlength="80">
+          <span id="scratchpad-save-status" class="scratchpad-status" aria-live="polite">Saved to browser</span>
+        </div>
+
+        <label for="scratchpad-body" class="sr-only">Scratchpad Notes</label>
+        <textarea id="scratchpad-body" class="notebook-textarea" placeholder="Jot down quick thoughts, formulas, active questions, or scratch steps..."></textarea>
+
+        <div class="scratchpad-footer">
+          <span class="scratchpad-hint">Auto-saves on keystroke</span>
+          <button type="button" id="scratchpad-clear-btn" class="btn btn-ghost btn-xs text-danger">Clear Pad</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- WINDOW 3: Session Handoff Window -->
+    <article id="win-handoff" class="desk-window desk-window--handoff" aria-labelledby="handoff-win-title" role="region" hidden>
+      <header class="window-header">
+        <div class="window-title-wrap">
+          <span class="window-icon" aria-hidden="true">🔄</span>
+          <h2 id="handoff-win-title" class="window-title">Session Handoff</h2>
+        </div>
+        <div class="window-controls">
+          <button type="button" class="window-ctrl-btn ctrl-min" data-action="minimize" aria-label="Minimize Handoff window" title="Minimize">_</button>
+          <button type="button" class="window-ctrl-btn ctrl-close" data-action="close" aria-label="Close Handoff window" title="Close">✕</button>
+        </div>
+      </header>
+      <div class="window-body">
+        <p class="handoff-intro">
+          Before taking a study break or closing your desk, record exactly where you stopped so you can restart in seconds later:
+        </p>
+
+        <form id="handoff-form" class="handoff-form">
+          <label for="handoff-input" class="form-label font-bold">When I return, first I will:</label>
+          <textarea id="handoff-input" class="input-textarea" rows="3" placeholder="e.g. Open chapter 3, review formula 4.2, and solve question 1..." maxlength="200" required></textarea>
+
+          <div class="handoff-form-actions">
+            <button type="submit" class="btn btn-accent">Save Session Handoff</button>
+            <span id="handoff-save-status" class="status-msg" aria-live="polite"></span>
+          </div>
+        </form>
+
+        <div class="last-handoff-box">
+          <span class="box-label">Current Saved Handoff:</span>
+          <p id="saved-handoff-preview" class="saved-handoff-preview">No handoff saved yet.</p>
+          <time id="saved-handoff-time" class="saved-handoff-time"></time>
+        </div>
+      </div>
+    </article>
+
+    <!-- WINDOW 4: 5-Minute Rescue Window (Custom Original Feature) -->
+    <article id="win-rescue" class="desk-window desk-window--rescue" aria-labelledby="rescue-win-title" role="region" hidden>
+      <header class="window-header">
+        <div class="window-title-wrap">
+          <span class="window-icon" aria-hidden="true">⚡</span>
+          <h2 id="rescue-win-title" class="window-title">5-Minute Study Rescue</h2>
+        </div>
+        <div class="window-controls">
+          <button type="button" class="window-ctrl-btn ctrl-min" data-action="minimize" aria-label="Minimize 5-Minute Rescue window" title="Minimize">_</button>
+          <button type="button" class="window-ctrl-btn ctrl-close" data-action="close" aria-label="Close 5-Minute Rescue window" title="Close">✕</button>
+        </div>
+      </header>
+      <div class="window-body">
+        <p class="rescue-intro">
+          Stuck or hesitating to start? Break the cold-start paralysis with a 5-minute jumpstart task:
+        </p>
+
+        <div class="rescue-templates">
+          <button type="button" class="rescue-card" data-task="Read exactly 1 page or review 1 note sheet" data-estimate="5" data-energy="low">
+            <span class="rescue-card__icon" aria-hidden="true">📖</span>
+            <div class="rescue-card__text">
+              <strong>Read 1 Page / Note</strong>
+              <span>5 min · Low energy starter</span>
+            </div>
+            <span class="rescue-card__arrow" aria-hidden="true">→</span>
+          </button>
+
+          <button type="button" class="rescue-card" data-task="Solve 1 single practice problem or write 1 formula" data-estimate="5" data-energy="medium">
+            <span class="rescue-card__icon" aria-hidden="true">📐</span>
+            <div class="rescue-card__text">
+              <strong>Solve 1 Practice Problem</strong>
+              <span>5 min · Medium energy starter</span>
+            </div>
+            <span class="rescue-card__arrow" aria-hidden="true">→</span>
+          </button>
+
+          <button type="button" class="rescue-card" data-task="Clear physical desk, close extra tabs, and open notebook" data-estimate="5" data-energy="low">
+            <span class="rescue-card__icon" aria-hidden="true">🧹</span>
+            <div class="rescue-card__text">
+              <strong>Organize Desk & Open Book</strong>
+              <span>5 min · Low energy environment reset</span>
+            </div>
+            <span class="rescue-card__arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </article>
+
+    <!-- WINDOW 5: Project Shelf Window -->
+    <article id="win-projects" class="desk-window desk-window--projects" aria-labelledby="projects-win-title" role="region" hidden>
+      <header class="window-header">
+        <div class="window-title-wrap">
+          <span class="window-icon" aria-hidden="true">📚</span>
+          <h2 id="projects-win-title" class="window-title">Aarav's Project Shelf</h2>
+        </div>
+        <div class="window-controls">
+          <button type="button" class="window-ctrl-btn ctrl-min" data-action="minimize" aria-label="Minimize Project Shelf window" title="Minimize">_</button>
+          <button type="button" class="window-ctrl-btn ctrl-close" data-action="close" aria-label="Close Project Shelf window" title="Close">✕</button>
+        </div>
+      </header>
+      <div class="window-body">
+        <p class="projects-intro">
+          Verified study tools, bots, and journals built by Aarav:
+        </p>
+        <div id="projects-container" class="projects-grid"></div>
+      </div>
+    </article>
+
+  </main>
+
+  <script type="module" src="script.js"></script>
+</body>
 </html>

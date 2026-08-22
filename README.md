@@ -1,101 +1,144 @@
-# Aarav Workbench OS
+# 📖 Aarav's Study Desk
 
-A local-first, browser-based project desk for exploring Aarav's small tools, build notes, and practical experiments through movable windows.
+> A clean, distraction-free browser desk designed to help you pick one realistic next study task, jot down scratch notes, and save session handoffs before stepping away.
 
-## What it is
+**Live Demo:** [https://aaravkatiyar55-gif.github.io/aarav-workbench-os/](https://aaravkatiyar55-gif.github.io/aarav-workbench-os/)
 
-Aarav Workbench OS is intentionally a focused browser workbench rather than a copy of a computer operating system. It helps a visitor browse documented projects, keep a small private note or journal draft, adjust the desk, and take a short offline break without an account.
+---
 
-The public app has no sign-in, password, cloud sync, server-side storage, analytics, or Workbench backend API. It cannot browse arbitrary files, open installed apps, run PowerShell or other shell commands, or optimize a visitor's operating system. If a visitor actively chooses a wallpaper image, the browser uses only that selected image during the open tab.
+## Why I Built This
 
-## Features
+When studying or working on coding projects, the biggest issue I faced wasn't solving a difficult problem—it was the cognitive overwhelm of multitasking across too many apps, browser tabs, and complicated productivity dashboards.
 
-- A quiet first landing with every app closed until the visitor chooses one from the landing actions, dock, or Command Dock
-- A small browser-local Recent Desk trail so returning visitors can reopen the last few tools without cluttering the landing screen
-- Three Desk Modes—Explore, Focus, and Break—available from both the landing view and the top bar. Each opens a purposeful set of tools and minimizes the rest without closing or deleting anything
-- An open-window strip on wider screens for focusing or restoring the apps already on the desk
-- Multiple draggable, closable, minimizable, and maximizable windows with dock restore and front-of-stack focus
-- Live local clock, Command Dock (`Ctrl`/`Cmd` + `K`), `Alt` + arrow movement for a focused title bar, and `Alt` + `PageUp`/`PageDown` to cycle visible windows
-- Project Shelf with verified public source/demo links, plus Build Notes and Toolbox windows
-- **Notebook** and **Story Journal** for browser-local writing; each has its own clear control and confirmation
-- **Focus List** for a deliberately small browser-local list of next steps, with add, complete, and remove controls
-- Optional browser speech recognition for the journal, with Hindi and English choices, only after a visitor starts it and their browser handles permission; Workbench does not retain audio
-- **Theme Lab** with Paper, Night, Moss, and Ember themes, a WebOS-only quieter-motion setting, and a session-only custom wallpaper preview
-- **Game Room** with a keyboard-accessible game switcher for Signal Sprint reaction play and Desk Grid memory matching; local best scores persist in the browser
-- **Workbench Console** with a small allowlist of browser-only commands such as `help`, `open notebook`, `open games`, `next`, `previous`, `home`, `theme moss`, `status`, and `clear`
-- A non-destructive **Clear Desk** action in Command Dock and Console (`home` / `clear desk`) that returns to the quiet landing while keeping browser-local writing, settings, scores, and lists
-- **Launchpad** links that open YouTube, Facebook, and Instagram in a new tab without embedding, signing in to, controlling, or changing advertising on those services
-- A browser-local check-in streak that is not coding time, a Stardance reward, transferable value, or a prize
-- Mobile stacked-window layout and reduced-motion support
+My earlier workbench experiment ended up with 12 movable windows, mini-games, and complex tools. While it was fun to build, in real daily use it felt like an over-engineered operating system rather than a calm place to study.
 
-## Local data and privacy boundary
+I wanted a focused, digital study desk inspired by a physical school desk:
+- **One Next Action at a time**: A prominent focus card so you always know what single step to do right now, instead of staring at an intimidating 20-item backlog.
+- **A lined-paper scratchpad**: An instant place to dump formulas, questions, or quick ideas without opening a heavy note app.
+- **Session Handoffs**: A dedicated spot to write *"When I return, first I will..."* before stepping away for lunch or a break, eliminating cold-start friction when returning.
+- **5-Minute Study Rescue**: 1-click low-activation prompts to break study hesitation on days when getting started feels difficult.
 
-All saved Workbench state is namespaced under `aarav-workbench-os.*` in the visitor's own browser. The app may save:
+---
 
-- desktop window layout, state, z-order, and a local save timestamp;
-- theme and quieter-motion preference;
-- Notebook title/body and Story Journal text;
-- Focus List steps and completion state;
-- up to four recent Workbench app shortcuts; and
-- local check-in streak date/count; and
-- local best scores for the two games.
+## Architecture & Deliberate Simplification
 
-The custom wallpaper chooser uses a temporary in-memory object URL only. It does not store the image bytes, file path, filename, or object URL, and it is removed on refresh or when the visitor clicks Remove temporary wallpaper.
+During development, an earlier iteration explored an OS-style floating taskbar (`window-strip.js`) that dynamically tracked and minimized open windows along the screen bottom. However, practical testing revealed that dynamic floating strips introduced visual clutter, overlapped content on smaller viewports, and added brittle DOM synchronization overhead.
 
-Browser-local writing and preferences are not encrypted. They are appropriate for ordinary notes, not secrets or sensitive personal information—especially on a shared device.
+To keep the study desk lightweight and calm, a deliberate simplification was made:
+1. **Semantic Header Dock**: Replaced floating taskbars with a fixed, accessible topbar launcher dock (`<nav class="desk-launcher-dock">`) where each window can be toggled directly with clear state indicators (`aria-expanded`).
+2. **Central Desk Hub**: When a user opens the desk or closes all active windows, a distraction-free central landing hub (`#desk-hub`) reveals itself, offering instant one-click pathways into any tool.
 
-Reset layout changes only the desktop layout. It does not clear writing, themes, streaks, or game scores. Clearing Notebook or Story Journal text always uses its own visible confirmation and affects only that selected Workbench key.
+This architecture ensures predictable window state, zero floating UI overlap, and accessible keyboard navigation without unnecessary JavaScript framework overhead.
 
-The optional speech-recognition feature depends on the browser and its permission/service behavior. If used, the browser may send spoken audio to its own speech service; avoid dictating sensitive information. Workbench stores only the resulting text draft if the browser supplies one; it does not make or keep an audio recording.
+---
 
-## Browser-only Console
+## The 5 Study Windows
 
-The Workbench Console is deliberately not a terminal. It does not evaluate JavaScript, shell syntax, PowerShell, command prompts, file paths, or app-launch requests. Unknown input receives a local explanatory message. Console output is temporary and is not saved.
+### 1. 🎯 Today's Focus (Window 1)
+- Add a study task with estimated duration (5–60 mins) and required energy level (*Low, Medium, High*).
+- Displays a prominent **Single Next Action** card pointing directly to your immediate next step.
+- Queue list with check-off completion and delete controls. Fresh users start with a completely clean, empty queue.
 
-## Run locally
+### 2. 📝 Study Scratchpad (Window 2)
+- Lined-paper digital notepad with red margin guide and warm parchment styling.
+- Auto-saves keystroke-by-keystroke to `localStorage` with a debounced status indicator.
+- Includes a safe "Clear Pad" confirmation dialog.
 
-No dependency installation is required.
+### 3. 🔄 Session Handoff (Window 3)
+- Solves the common problem of forgetting where you were after taking a study break.
+- Enter a short sentence describing your stopping point and immediate next action.
+- When opening the desk on your next session, a prominent **Resume Banner** appears at the top of the desk with a 1-click button to adopt it as Today's task and clear the consumed handoff.
 
-1. Open this folder in VS Code.
-2. Start a static server, for example:
+### 4. ⚡ 5-Minute Study Rescue (Custom Feature)
+- Overcomes study procrastination and inertia with three actionable low-friction templates:
+  - 📖 *Read 1 Page / Note (5 min · Low energy)*
+  - 📐 *Solve 1 Practice Problem (5 min · Medium energy)*
+  - 🧹 *Organize Desk & Open Book (5 min · Low energy)*
+- Clicking any rescue card immediately injects a 5-minute task into your Today queue and focuses your workspace.
 
-   ```powershell
-   py -m http.server 4173
-   ```
+### 5. 📚 Project Shelf (Window 5)
+- Quick access to Aarav's projects:
+  - **Focus Orbit** (Live Demo & Source: Student Study Dashboard)
+  - **Aarav Builds** (Live Demo & Source: Personal Build Journal)
+  - **QueueClear** (In local development)
+  - **Aarav Ping Bot** (Documented in Aarav Builds)
+- Active external links include `target="_blank"` and `rel="noopener noreferrer"` for security.
 
-3. Open `http://127.0.0.1:4173` in a browser.
+---
 
-Run the source checks with:
+## Design & Visual Theme
 
-```powershell
-npm run check
-git diff --check
+- **School Study Desk Aesthetic**: Warm off-white parchment canvas (`#f4f1ea`), deep study forest green and slate navy titlebars (`#1e3a2f` & `#1b263b`), and warm amber highlighter accents (`#d97706`).
+- **Physical Dragging**: Window headers support smooth pointer dragging with automatic boundary clamping inside the viewport on both drag and window resize.
+- **Quiet Landing**: By default on a fresh visit or reset, all windows start closed and the quiet Desk Hub welcomes the student.
+- **Mobile Responsive**: Stacks cleanly in a single vertical column on mobile screens (`<= 640px`) with zero horizontal scroll leakage.
+- **High Contrast & Accessible**: 3px amber focus rings (`outline: 3px solid var(--accent-amber)`), semantic landmark HTML, and full keyboard navigation.
+
+---
+
+## Deployment & Local Storage
+
+- **Static Web Application**: Hosted as static files via GitHub Pages and easily run locally using any standard static file server.
+- **100% Browser-Local Data**: All state is saved exclusively in the client's browser storage via `localStorage` keys:
+  - `studydesk.tasks.v1`
+  - `studydesk.scratchpad.v1`
+  - `studydesk.handoff.v1`
+  - `studydesk.windows.v2`
+- **Defensive Storage Normalization**: Built-in validators protect against malformed or corrupted localStorage payloads so the UI never crashes.
+- **Zero Backend**: No remote servers, user accounts, authentication tokens, or databases required.
+- **Zero Telemetry**: No tracking scripts, analytics, or third-party cookies.
+
+---
+
+## Local Setup
+
+Because the application uses native JavaScript ES Modules (`import`/`export`), it is best run through a local web server:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/aaravkatiyar55-gif/aarav-workbench-os.git
+cd aarav-workbench-os
+
+# 2. Start a local server (Python 3):
+python -m http.server 8000
+
+# Or with Node.js:
+npx serve .
 ```
 
-The exact observed results and honest test limits are in [TESTING.md](TESTING.md).
+Then open `http://localhost:8000/` in your browser.
 
-## Deployment
+---
 
-The public GitHub Pages demo is:
+## Manual Testing & Verification
 
-- https://aaravkatiyar55-gif.github.io/aarav-workbench-os/
+The repository includes a comprehensive manual verification test log in [`TESTING.md`](./TESTING.md).
 
-It is a public, password-free static page. After a push to `main`, GitHub Pages publishes from the repository root; the deployed page must be checked in a fresh browser tab before release claims are made.
+Quick syntax check:
+```bash
+node --check script.js
+node --check projects.js
+```
 
-## Screenshot
+---
 
-This is a real capture of the foundational deployed desktop. A separate clean browser capture of the expanded local-first desktop was made after fresh public verification; it has not been uploaded to Stardance. Do not use the foundational image below as proof of the later expansion.
+## Honest Limitations
 
-![Foundational deployed Aarav Workbench OS desktop](docs/screenshots/aarav-workbench-os-deployed.png)
+- **Single Browser Storage**: Data is saved inside the local browser profile. Clearing your browser cache or switching devices will reset the local desk data.
+- **No Cloud Sync**: There is no multi-device synchronization.
+- **Static Delivery**: As a standard static web application, network connectivity is required on initial load if accessing via GitHub Pages (unless running from a cloned local folder).
+- **Single-User Scope**: Designed as a personal study tool for one student at a desk, not a team collaboration suite.
 
-## Future companion boundary
+---
 
-An installable `aarav-workbench-companion` would be a separate future project, not part of this website or its Stardance evidence. It would require a separate security design, explicit opt-in permissions, and its own release process before it could access any computer resources.
+## AI Usage Disclosure
 
-## AI usage
+In keeping with honest project transparency:
+- **LLM Assistance**: Generative AI tools (LLMs) were used for boilerplate scaffolding, drafting initial CSS/JS code structures, and organizing test matrix documentation in `TESTING.md`.
+- **Human Work & Verification**: The core study desk concept, feature reduction from the previous 12-window OS, session handoff workflow, prompt definitions, defensive storage validation rules, and manual test execution were directed and verified by Aarav.
 
-OpenAI Codex was used for planning, implementation assistance, debugging, testing guidance, documentation, and deployment preparation. The project’s Stardance declaration, README, devlogs, and test evidence must describe actual work and must not claim human-only authorship, unsupported behavior, approval, or rewards.
+---
 
-## Current status
+## License
 
-The local-first expansion and the v11 visible-window navigation update are deployed and were freshly checked at the public URL. Two factual Stardance devlogs with real screenshots have been posted. A third devlog and final Ship action remain gated by Stardance's real logged-time requirement; this project does not claim those steps are complete until its UI enables them.
+MIT License © 2026 Aarav Katiyar. See [`LICENSE`](./LICENSE) for full details.
